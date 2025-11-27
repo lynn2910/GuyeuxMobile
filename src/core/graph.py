@@ -1,0 +1,44 @@
+import math
+import networkx as nx
+from models.base import BaseEdge
+
+class RoadGraph:
+    def __init__(self):
+        self.graph = nx.DiGraph()
+
+    def add_node(self, node_id: str, x: float, y: float):
+        self.graph.add_node(node_id, x=x, y=y)
+
+    def add_edge(self, src: str, dst: str, edge_obj: BaseEdge):
+        self.graph.add_edge(src, dst, object=edge_obj)
+
+    def add_edge_back_and_forth(self, a: str, b: str, edge_obj: BaseEdge):
+        self.graph.add_edge(a, b, object=edge_obj)
+        self.graph.add_edge(b, a, object=edge_obj)
+
+    def get_edge(self, a: str, b: str):
+        return self.graph[a][b]["object"]
+
+    def get_edges(self):
+        return self.graph.edges(data=True)
+
+    def get_node(self, node_id: str):
+        return self.graph.nodes[node_id]
+
+    def get_path(self, src: str, dst: str, eval_func):
+
+        def euclidean_heuristic(u, v):
+            try:
+                x1, y1 = self.graph.nodes[u]['x'], self.graph.nodes[u]['y']
+                x2, y2 = self.graph.nodes[v]['x'], self.graph.nodes[v]['y']
+                return math.sqrt((x1 - x2)**2 + (y1 - y2)**2)
+            except KeyError:
+                return 0
+
+        return nx.astar_path(
+            self.graph,
+            src,
+            dst,
+            heuristic=euclidean_heuristic,
+            weight=eval_func
+        )
