@@ -1,0 +1,60 @@
+GRAPH(cellular):
+
+    NODE H_NW (10, 90)
+    NODE H_NE (90, 90)
+    NODE H_SE (90, 10)
+    NODE H_SW (10, 10)
+
+    NODE N_Entrance (50, 90)
+    NODE E_Entrance (90, 50)
+    NODE S_Entrance (50, 10)
+    NODE W_Entrance (10, 50)
+
+    NODE CENTER (50, 50)
+    NODE AVE_N (50, 70)
+    NODE AVE_E (70, 50)
+    NODE AVE_S (50, 30)
+    NODE AVE_W (30, 50)
+
+    NODE RES_1 (20, 80)
+    NODE RES_2 (80, 20)
+
+    UEDGE H_NW N_Entrance
+    UEDGE N_Entrance H_NE
+    UEDGE H_NE E_Entrance
+    UEDGE E_Entrance H_SE
+    UEDGE H_SE S_Entrance
+    UEDGE S_Entrance H_SW
+    UEDGE H_SW W_Entrance
+    UEDGE W_Entrance H_NW
+
+    UEDGE N_Entrance AVE_N
+    UEDGE AVE_N N_Entrance
+    UEDGE E_Entrance AVE_E
+    BEDGE AVE_E E_Entrance
+    UEDGE S_Entrance AVE_S
+    UEDGE AVE_S S_Entrance
+    UEDGE W_Entrance AVE_W
+    UEDGE AVE_W W_Entrance
+
+    BEDGE AVE_N CENTER
+    BEDGE AVE_E CENTER
+    BEDGE AVE_S CENTER
+    BEDGE AVE_W CENTER
+
+    BEDGE AVE_W RES_1
+    BEDGE AVE_E RES_2
+
+SIMULATION:
+    CAR 1 (H_NW, H_SE)
+    CAR 2 (H_SW, H_NE)
+    CAR 3 (RES_1, RES_2)
+    CAR 4 (RES_2, RES_1)
+    CAR 5 (H_NW, CENTER)
+    CAR 6 (CENTER, H_SE)
+    CAR 7 (AVE_N, AVE_S)
+    CAR 8 (AVE_W, AVE_E)
+    CAR 9 (N_Entrance, S_Entrance)
+    CAR 10 (RES_1, CENTER)
+    CAR 11 (RES_1, H_NE)
+    CAR 12 (H_SW, RES_2)

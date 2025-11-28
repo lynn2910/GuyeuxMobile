@@ -53,7 +53,6 @@ class Simulation:
             edge = data['object']
             exiting_vehicles = edge.update()
 
-            print("debug: " + str(config.DEBUG))
             if config.DEBUG:
                 print(f"\nEdge from {src} to {dist} :")
                 edge.draw()

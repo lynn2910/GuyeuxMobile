@@ -2,6 +2,7 @@ import math
 import networkx as nx
 from models.base import BaseEdge
 
+
 class RoadGraph:
     def __init__(self):
         self.graph = nx.DiGraph()
@@ -17,7 +18,10 @@ class RoadGraph:
         self.graph.add_edge(b, a, object=edge_obj)
 
     def get_edge(self, a: str, b: str):
-        return self.graph[a][b]["object"]
+        edge_data = self.graph.get_edge_data(a, b)
+        if edge_data is None:
+            raise RuntimeError(f"No edge found from {a} to {b}")
+        return edge_data["object"]
 
     def get_edges(self):
         return self.graph.edges(data=True)
@@ -31,7 +35,7 @@ class RoadGraph:
             try:
                 x1, y1 = self.graph.nodes[u]['x'], self.graph.nodes[u]['y']
                 x2, y2 = self.graph.nodes[v]['x'], self.graph.nodes[v]['y']
-                return math.sqrt((x1 - x2)**2 + (y1 - y2)**2)
+                return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
             except KeyError:
                 return 0
 

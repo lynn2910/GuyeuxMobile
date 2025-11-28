@@ -44,13 +44,15 @@ class Parser:
         nodes = {}
         edges = []
 
-        while self.current_token().type in [TokenType.NODE, TokenType.EDGE]:
+        while self.current_token().type in [TokenType.NODE, TokenType.UEDGE, TokenType.BEDGE]:
             if self.current_token().type == TokenType.NODE:
                 node_id, x, y = self.parse_node()
                 nodes[node_id] = (x, y)
-            elif self.current_token().type == TokenType.EDGE:
-                from_node, to_node = self.parse_edge()
-                edges.append((from_node, to_node))
+
+            elif self.current_token().type in [TokenType.UEDGE, TokenType.BEDGE]:
+                edge_type = self.current_token().type
+                from_node, to_node = self.parse_edge(edge_type)
+                edges.append((edge_type, from_node, to_node))
 
             self.skip_newlines()
 
@@ -70,8 +72,8 @@ class Parser:
         self.expect(TokenType.RPAREN)
         return node_id, x, y
 
-    def parse_edge(self) -> Tuple[str, str]:
-        self.expect(TokenType.EDGE)
+    def parse_edge(self, edge_type: TokenType) -> Tuple[str, str]:
+        self.expect(edge_type)
         from_node = self.expect(TokenType.IDENTIFIER).value
         to_node = self.expect(TokenType.IDENTIFIER).value
         return from_node, to_node
@@ -113,11 +115,9 @@ def import_map(file_path: str):
     with open(file_path, "r") as f:
         content = f.read()
 
-    # Tokenization
     tokenizer = Tokenizer(content)
     tokens = tokenizer.tokenize()
 
-    # Parsing
     parser = Parser(tokens)
     graph_data = parser.parse_graph()
     simulation_data = parser.parse_simulation()
@@ -138,14 +138,23 @@ def build_graph(graph_data: dict) -> RoadGraph:
     for node_id, (x, y) in graph_data["nodes"].items():
         graph.add_node(node_id, x, y)
 
-    for from_node, to_node in graph_data["edges"]:
+    for edge_type, from_node, to_node in graph_data["edges"]:
         if graph_type == "cellular":
             x1, y1 = graph_data["nodes"][from_node]
             x2, y2 = graph_data["nodes"][to_node]
             distance = ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5
 
-            edge = CellularEdge(distance=distance, vmax=5, prob_slow=0.1)
-            graph.add_edge(from_node, to_node, edge)
+            if edge_type == TokenType.UEDGE:
+                edge = CellularEdge(distance=distance, vmax=5, prob_slow=0.1)
+                graph.add_edge(from_node, to_node, edge)
+
+            elif edge_type == TokenType.BEDGE:
+                edge_forward = CellularEdge(distance=distance, vmax=5, prob_slow=0.1)
+                edge_backward = CellularEdge(distance=distance, vmax=5, prob_slow=0.1)
+
+                graph.add_edge(from_node, to_node, edge_forward)
+                graph.add_edge(to_node, from_node, edge_backward)
+
         else:
             raise SyntaxError(f"Invalid edge type given for the graph : {graph_type}")
 
@@ -166,9 +175,8 @@ def build_vehicles(simulation_data: List[dict], graph: RoadGraph) -> List[Tuple[
         vehicle_path = graph.get_path(start_node, end_node, path_func)
 
         if not vehicle_path or len(vehicle_path) < 2:
-            print(
-                f"Attention: Impossible de trouver un chemin de {start_node} à {end_node} pour le véhicule {car_data['id']}")
-            continue
+            raise SyntaxError(
+                f"Warning: cannot find a path from {start_node} to {end_node} for the vehicle {car_data['id']}")
 
         vehicle = Vehicle(vehicle_id=car_data["id"], path=vehicle_path[1:])
 

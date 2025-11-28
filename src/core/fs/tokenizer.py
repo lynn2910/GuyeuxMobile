@@ -6,7 +6,10 @@ from typing import Optional, List
 class TokenType(Enum):
     GRAPH = "GRAPH"
     NODE = "NODE"
-    EDGE = "EDGE"
+
+    UEDGE = "UEDGE"
+    BEDGE = "BEDGE"
+
     SIMULATION = "SIMULATION"
     CAR = "CAR"
 
@@ -93,7 +96,8 @@ class Tokenizer:
         keywords = {
             "GRAPH": TokenType.GRAPH,
             "NODE": TokenType.NODE,
-            "EDGE": TokenType.EDGE,
+            "UEDGE": TokenType.UEDGE,
+            "BEDGE": TokenType.BEDGE,
             "SIMULATION": TokenType.SIMULATION,
             "CAR": TokenType.CAR,
         }

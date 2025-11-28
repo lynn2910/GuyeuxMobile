@@ -46,7 +46,7 @@ def run_simulation_from_file(file_path: str, max_ticks: int = 20, tps: float = 0
     print(f"Loading configuration from '{file_path}'...\n")
     graph, vehicles = import_map(file_path)
 
-    print(f"Graph loaded: {len(graph.graph.nodes)} nœuds, {len(graph.graph.edges)} arêtes")
+    print(f"Graph loaded: {len(graph.graph.nodes)} nodes, {len(graph.graph.edges)} edges")
     print(f"Vehicles loaded: {len(vehicles)}")
 
     simulation = Simulation(graph, tps)
@@ -54,7 +54,7 @@ def run_simulation_from_file(file_path: str, max_ticks: int = 20, tps: float = 0
     print("\n----- Vehicles -----")
     for vehicle, start_edge in vehicles:
         simulation.add_vehicle(vehicle, start_edge)
-        print(f"Vehicle {vehicle.id} added with path: {[vehicle.path[0]] + vehicle.path}")
+        print(f"Vehicle {vehicle.id} added with path: {vehicle.path}")
 
     print(f"\nLaunching the simulation (max {max_ticks} ticks)...\n")
     simulation.running = True
