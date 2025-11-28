@@ -1,6 +1,7 @@
 import math
 import networkx as nx
 from models.base import BaseEdge
+import matplotlib.pyplot as plt
 
 
 class RoadGraph:
@@ -49,3 +50,27 @@ class RoadGraph:
             )
         except nx.NetworkXNoPath:
             raise RuntimeError(f"No path found between '{src}' and '{dst}' using A*")
+
+    def show_map(self, file_name: str):
+        pos = {
+            node_id: (data['x'], data['y'])
+            for node_id, data in self.graph.nodes(data=True)
+        }
+
+        plt.figure(figsize=(10, 8))
+
+        nx.draw(
+            self.graph,
+            pos=pos,
+            with_labels=True,
+            node_size=700,
+            node_color='skyblue',
+            font_size=10,
+            font_weight='bold',
+            arrows=True,
+            arrowsize=20
+        )
+
+        plt.title("Visualisation de la carte (Coordonnées réelles)")
+        plt.axis('equal')
+        plt.savefig(f"data/results/{file_name}.png")

@@ -8,8 +8,8 @@ def parse_arguments() -> argparse.Namespace:
 
     Return: Parsed arguments containing:
             - map: Path to the map file (required)
-            - tps: Ticks per second (optional, default=0.5)
-            - max_ticks: Maximum number of ticks (optional, default=20)
+            - tps: Ticks per second (optional, default=1)
+            - max_ticks: Maximum number of ticks (optional, default=2000)
             - debug: Enable debug logging (optional, default=False)
     """
     parser = argparse.ArgumentParser(
@@ -34,15 +34,15 @@ Examples:
     parser.add_argument(
         "--tps",
         type=float,
-        default=0.5,
-        help="Ticks per second (default: 0.5, must be > 0)"
+        default=1,
+        help="Ticks per second (default: 1, must be > 0)"
     )
 
     parser.add_argument(
         "--max-ticks",
         type=int,
-        default=20,
-        help="Maximum number of ticks to simulate (default: 20, must be > 0)"
+        default=2000,
+        help="Maximum number of ticks to simulate (default: 2000, must be > 0)"
     )
 
     parser.add_argument(

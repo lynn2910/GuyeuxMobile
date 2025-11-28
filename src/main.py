@@ -2,11 +2,13 @@
 import os
 from os import path
 
+import networkx as nx
+import matplotlib.pyplot as plt
+
 from cli import parse_arguments, debug_log
 from core.fs.parser import import_map
 from core.graph import RoadGraph
 from core.simulation import Simulation
-from entities.vehicle import Vehicle
 from models.cellular import CellularEdge
 
 
@@ -48,6 +50,10 @@ def run_simulation_from_file(file_path: str, max_ticks: int = 20, tps: float = 0
 
     print(f"Graph loaded: {len(graph.graph.nodes)} nodes, {len(graph.graph.edges)} edges")
     print(f"Vehicles loaded: {len(vehicles)}")
+
+    print("\n----- Generate graph -----")
+    file_name = path.basename(file_path).replace(".smap", "")
+    graph.show_map(file_name)
 
     simulation = Simulation(graph, tps)
 
