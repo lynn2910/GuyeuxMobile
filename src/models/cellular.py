@@ -60,7 +60,7 @@ class CellularEdge(BaseEdge):
             last_vehicle_pos = next_pos
 
         # Add a vehicle from the queue if any
-        if not self.entry_queue.empty():
+        if not self.entry_queue.empty() and self.cells[0] is None:
             self.cells[0] = self.entry_queue.get_nowait()
 
         return exiting
