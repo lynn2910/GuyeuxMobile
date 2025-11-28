@@ -1,0 +1,8 @@
+GRAPH(cellular):
+NODE A (0,0)
+NODE B (10,20)
+EDGE A B
+
+SIMULATION:
+CAR 1 (A, B)
+CAR 2 (A, B)

@@ -1,10 +1,11 @@
 from time import sleep, time
 
-from core.graph import RoadGraph
+import config
+from cli import debug_log
 
 
 class Simulation:
-    def __init__(self, graph, tps: int):
+    def __init__(self, graph, tps: float):
         self.graph = graph
         self.vehicles = []
 
@@ -52,9 +53,11 @@ class Simulation:
             edge = data['object']
             exiting_vehicles = edge.update()
 
-            print(f"\nEdge from {src} to {dist} :")
-            edge.draw()
-            print(f"{len(exiting_vehicles)} exiting vehicles")
+            print("debug: " + str(config.DEBUG))
+            if config.DEBUG:
+                print(f"\nEdge from {src} to {dist} :")
+                edge.draw()
+                print(f"{len(exiting_vehicles)} exiting vehicles")
 
             # Redirecting all vehicles to the next edge or remove them
             for vehicle in exiting_vehicles:

@@ -5,7 +5,7 @@ class BaseEdge:
     """
 
     def __init__(self, distance: int):
-        self.distance = distance
+        self.distance = int(distance)
 
     def update(self) -> list:
         """

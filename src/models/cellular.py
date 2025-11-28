@@ -14,7 +14,7 @@ class CellularEdge(BaseEdge):
         super().__init__(distance)
         self.vmax = vmax
         self.prob_slow = prob_slow
-        self.cells = [None] * distance
+        self.cells = [None] * self.distance
 
         self.entry_queue = Queue()
 

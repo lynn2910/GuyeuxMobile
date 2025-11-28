@@ -2,6 +2,8 @@
 import os
 from os import path
 
+from cli import parse_arguments, debug_log
+from core.fs.parser import import_map
 from core.graph import RoadGraph
 from core.simulation import Simulation
 from entities.vehicle import Vehicle
@@ -32,41 +34,50 @@ def build_sample_city() -> RoadGraph:
     return road
 
 
-# ---------------- MAIN ---------------- #
-
-def run_cellular():
+def run_simulation_from_file(file_path: str, max_ticks: int = 20, tps: float = 0.5):
+    """
+    Execute a simulation from a file
+    :param file_path: The path of the file to be simulated
+    :param max_ticks: The maximum number of ticks
+    :param tps: The number of ticks per second
+    """
     init_required_files_and_folders()
 
-    road = build_sample_city()
-    path_func = CellularEdge.evaluate_weight
+    print(f"Loading configuration from '{file_path}'...\n")
+    graph, vehicles = import_map(file_path)
 
-    vehicle_path = road.get_path("A", "C", path_func)
-    print("Chemin trouvé:", vehicle_path)
+    print(f"Graph loaded: {len(graph.graph.nodes)} nœuds, {len(graph.graph.edges)} arêtes")
+    print(f"Vehicles loaded: {len(vehicles)}")
 
-    simulation = Simulation(road, 1)
+    simulation = Simulation(graph, tps)
 
-    # Vehicle 1: starts at edge A->B
-    vehicle1 = Vehicle(vehicle_id=1, path=vehicle_path[1:])
-    start_edge1 = road.get_edge("A", "B")
-    simulation.add_vehicle(vehicle1, start_edge1)
+    print("\n----- Vehicles -----")
+    for vehicle, start_edge in vehicles:
+        simulation.add_vehicle(vehicle, start_edge)
+        print(f"Vehicle {vehicle.id} added with path: {[vehicle.path[0]] + vehicle.path}")
 
-    # Vehicle 2: starts at edge A->B (a bit delayed)
-    vehicle2 = Vehicle(vehicle_id=2, path=vehicle_path[1:])
-    start_edge2 = road.get_edge("A", "B")
-    simulation.add_vehicle(vehicle2, start_edge2)
-
-    # Run simulation for a limited number of ticks
+    print(f"\nLaunching the simulation (max {max_ticks} ticks)...\n")
     simulation.running = True
-    max_ticks = 20
 
     while simulation.running and simulation.t < max_ticks:
         simulation.tick()
 
-        # Stop if all vehicles have exited
         if len(simulation.vehicles) == 0:
-            print("\nAll vehicles have completed their journey!")
+            print("\nAll vehicles finished their walk-out!")
             simulation.running = False
+
+    print(f"\nSimulation finished after {simulation.t} ticks")
 
 
 if __name__ == "__main__":
-    run_cellular()
+    args = parse_arguments()
+
+    debug_log(f"Map file: {args.map}")
+    debug_log(f"TPS: {args.tps}")
+    debug_log(f"Max ticks: {args.max_ticks}")
+
+    run_simulation_from_file(
+        file_path=args.map,
+        max_ticks=args.max_ticks,
+        tps=args.tps
+    )
