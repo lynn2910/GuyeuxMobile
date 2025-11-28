@@ -1,5 +1,5 @@
 class Vehicle:
-    def __init__(self, vehicle_id: int, path: list[str]):
+    def __init__(self, vehicle_id: str, path: list[str]):
         self.id = vehicle_id
         self.path = path
         self.current_edge = None

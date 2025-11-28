@@ -22,7 +22,7 @@ class Parser:
     def expect(self, token_type: TokenType) -> Token:
         token = self.current_token()
         if token.type != token_type:
-            raise SyntaxError(f"Attendu {token_type}, trouvé {token.type} à la ligne {token.line}")
+            raise SyntaxError(f"Expected {token_type}, found {token.type} at line {token.line}")
         self.advance()
         return token
 
@@ -94,7 +94,11 @@ class Parser:
 
     def parse_car(self) -> dict:
         self.expect(TokenType.CAR)
-        car_id = self.expect(TokenType.NUMBER).value
+        try:
+            car_id = self.expect(TokenType.IDENTIFIER).value
+        except SyntaxError:
+            car_id = self.expect(TokenType.NUMBER).value
+        
         self.expect(TokenType.LPAREN)
         start_node = self.expect(TokenType.IDENTIFIER).value
         self.expect(TokenType.COMMA)

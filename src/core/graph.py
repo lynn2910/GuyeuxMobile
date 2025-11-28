@@ -39,10 +39,13 @@ class RoadGraph:
             except KeyError:
                 return 0
 
-        return nx.astar_path(
-            self.graph,
-            src,
-            dst,
-            heuristic=euclidean_heuristic,
-            weight=eval_func
-        )
+        try:
+            return nx.astar_path(
+                self.graph,
+                src,
+                dst,
+                heuristic=euclidean_heuristic,
+                weight=eval_func
+            )
+        except nx.NetworkXNoPath:
+            raise RuntimeError(f"No path found between '{src}' and '{dst}' using A*")
