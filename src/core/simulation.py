@@ -5,7 +5,7 @@ from cli import debug_log
 
 
 class Simulation:
-    def __init__(self, graph, tps: float):
+    def __init__(self, graph, tps: float, visualizer=None):
         self.graph = graph
         self.vehicles = []
 
@@ -14,6 +14,10 @@ class Simulation:
 
         self.t = 0
         self.running = False
+
+        self.since_last_update = 0
+
+        self.visualizer = visualizer
 
     def add_vehicle(self, vehicle, start_edge):
         """
@@ -31,18 +35,33 @@ class Simulation:
         The main loop of the simulation.
         :return:
         """
-        self.t += 1
-        print(f"------ Tick {self.t} ------")
+        print(self.since_last_update)
         start_time = time()
 
-        self.internal_step()
+        is_a_sim_update_tick = False
+        if self.since_last_update >= self.tps:
+            self.t += 1
+            print(f"------ Tick {self.t} ------")
+            
+            self.internal_step()
+            self.since_last_update = 0
+            is_a_sim_update_tick = True
 
-        elapsed = time() - start_time
-        wait_time = self.tick_duration - elapsed
-        if wait_time > 0:
-            sleep(wait_time)
-        else:
-            print(f"/!\\ Lag detected at tick '{self.t}' ({elapsed:.4f}s elapsed since last tick)")
+        if self.visualizer:
+            self.visualizer.update(self.t)
+            if not self.visualizer.handle_events():
+                self.running = False
+                return
+
+        if not is_a_sim_update_tick:
+            elapsed = time() - start_time
+            self.since_last_update += elapsed
+
+        # wait_time = self.tick_duration - elapsed
+        # if wait_time > 0:
+        #     sleep(wait_time)
+        # else:
+        #     print(f"/!\\ Lag detected at tick '{self.t}' ({elapsed:.4f}s elapsed since last tick)")
 
     def internal_step(self):
         """
@@ -55,7 +74,7 @@ class Simulation:
 
             if config.DEBUG:
                 print(f"\nEdge from {src} to {dist} :")
-                edge.draw()
+                edge.draw_console()
                 print(f"{len(exiting_vehicles)} exiting vehicles")
 
             # Redirecting all vehicles to the next edge or remove them

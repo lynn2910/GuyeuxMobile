@@ -1,5 +1,7 @@
 from queue import Queue
 
+import pygame
+
 from models.base import BaseEdge
 
 
@@ -65,11 +67,54 @@ class CellularEdge(BaseEdge):
 
         return exiting
 
-    def draw(self):
+    def draw_console(self):
         for cell in self.cells:
             print("|", end="")
             print("o" if cell else " ", end="")
         print("|")
+
+    def draw_edge(self, src_pos: tuple, dst_pos: tuple, screen, vehicle_color):
+        """
+        Draw the vehicles on the road
+        :param src_pos: (x, y) coordinates of the source node
+        :param dst_pos: (x, y) coordinates of the destination node
+        :param screen: Pygame surface
+        :param vehicle_color: Vehicles color
+        """
+        for i, cell in enumerate(self.cells):
+            if cell is not None:
+                t = (i + 0.5) / self.distance
+
+                x = src_pos[0] + t * (dst_pos[0] - src_pos[0])
+                y = src_pos[1] + t * (dst_pos[1] - src_pos[1])
+
+                pygame.draw.circle(screen, vehicle_color, (int(x), int(y)), 5)
+
+                # font = pygame.font.Font(None, 14)
+                # speed_text = font.render(str(cell.speed), True, (0, 0, 0))
+                # screen.blit(speed_text, (int(x) + 7, int(y) - 5))
+
+    def get_infos(self) -> list:
+        """
+        Return information about an edge
+        :return: String list with the details
+        """
+        num_vehicles = sum(1 for cell in self.cells if cell is not None)
+        queue_size = self.entry_queue.qsize()
+
+        infos = [
+            f"Vmax:       {self.vmax}",
+            f"Prob slow:  {self.prob_slow:.2f}",
+            f"Vehicles:   {num_vehicles}/{self.distance}",
+        ]
+
+        if queue_size > 0:
+            infos.append(f"Queue:      {queue_size}")
+
+        occupation_rate = (num_vehicles / self.distance) * 100
+        infos.append(f"Occupation: {occupation_rate:.1f}%")
+
+        return infos
 
     @staticmethod
     def evaluate_weight(src, dst, data):

@@ -10,6 +10,7 @@ from core.fs.parser import import_map
 from core.graph import RoadGraph
 from core.simulation import Simulation
 from models.cellular import CellularEdge
+from ui.visualizer import Visualizer
 
 
 # ---------------- SETUP ---------------- #
@@ -36,11 +37,11 @@ def build_sample_city() -> RoadGraph:
     return road
 
 
-def run_simulation_from_file(file_path: str, max_ticks: int = 20, tps: float = 0.5):
+def run_simulation_from_file(file_path: str, tps: float = 0.5, show_viz: bool = False):
     """
     Execute a simulation from a file
+    :param show_viz: Whether to show the visualizer
     :param file_path: The path of the file to be simulated
-    :param max_ticks: The maximum number of ticks
     :param tps: The number of ticks per second
     """
     init_required_files_and_folders()
@@ -55,22 +56,26 @@ def run_simulation_from_file(file_path: str, max_ticks: int = 20, tps: float = 0
     file_name = path.basename(file_path).replace(".smap", "")
     graph.show_map(file_name)
 
-    simulation = Simulation(graph, tps)
+    viz = None
+    if show_viz:
+        viz = Visualizer(graph, 800, 500)
+
+    simulation = Simulation(graph, tps, visualizer=viz)
 
     print("\n----- Vehicles -----")
     for vehicle, start_edge in vehicles:
         simulation.add_vehicle(vehicle, start_edge)
         print(f"Vehicle {vehicle.id} added with path: {vehicle.path}")
 
-    print(f"\nLaunching the simulation (max {max_ticks} ticks)...\n")
+    print(f"\nLaunching the simulation...\n")
     simulation.running = True
 
-    while simulation.running and simulation.t < max_ticks:
+    while simulation.running:
         simulation.tick()
 
-        if len(simulation.vehicles) == 0:
-            print("\nAll vehicles finished their walk-out!")
-            simulation.running = False
+        # if len(simulation.vehicles) == 0:
+        #     print("\nAll vehicles finished their walk-out!")
+        #     simulation.running = False
 
     print(f"\nSimulation finished after {simulation.t} ticks")
 
@@ -80,10 +85,9 @@ if __name__ == "__main__":
 
     debug_log(f"Map file: {args.map}")
     debug_log(f"TPS: {args.tps}")
-    debug_log(f"Max ticks: {args.max_ticks}")
 
     run_simulation_from_file(
         file_path=args.map,
-        max_ticks=args.max_ticks,
-        tps=args.tps
+        tps=args.tps,
+        show_viz=args.visualizer
     )

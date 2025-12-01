@@ -9,16 +9,15 @@ def parse_arguments() -> argparse.Namespace:
     Return: Parsed arguments containing:
             - map: Path to the map file (required)
             - tps: Ticks per second (optional, default=1)
-            - max_ticks: Maximum number of ticks (optional, default=2000)
             - debug: Enable debug logging (optional, default=False)
     """
     parser = argparse.ArgumentParser(
-        description="Run a cellular automaton traffic simulation",
+        description="Run a traffic simulation",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
   python main.py --map data/city.map
-  python main.py --map data/city.map --tps 1.0 --max-ticks 100
+  python main.py --map data/city.map --tps 1.0
   python main.py --map data/city.map --debug
         """
     )
@@ -39,25 +38,23 @@ Examples:
     )
 
     parser.add_argument(
-        "--max-ticks",
-        type=int,
-        default=2000,
-        help="Maximum number of ticks to simulate (default: 2000, must be > 0)"
-    )
-
-    parser.add_argument(
         "--debug",
         action="store_true",
         help="Enable debug logging"
     )
 
+    parser.add_argument(
+        "--visualizer",
+        action="store_true",
+        help="Enable visualizer"
+    )
+
     args = parser.parse_args()
+
+    print(args)
 
     if args.tps <= 0:
         parser.error("--tps must be greater than 0")
-
-    if args.max_ticks <= 0:
-        parser.error("--max-ticks must be greater than 0")
 
     config.DEBUG = args.debug
 

@@ -14,6 +14,31 @@ class BaseEdge:
         """
         raise NotImplementedError
 
+    def draw_console(self):
+        """
+        Draws the traffic on the edge in the stdout.
+        :return:
+        """
+        raise NotImplementedError
+
+    def draw_edge(self, src_pos: tuple, dst_pos: tuple, screen, vehicle_color):
+        """
+        Draws the traffic on the edge using pygame.
+        :param vehicle_color:
+        :param screen:
+        :param src_pos: The source node coordinates
+        :param dst_pos: The destination node coordinates
+        :return:
+        """
+        raise NotImplementedError
+
+    def get_infos(self) -> list:
+        """
+        Return details about an edge.
+        :return: String list with the details
+        """
+        raise NotImplementedError
+
     @staticmethod
     def evaluate_weight(src: str, dst: str, data):
         """
