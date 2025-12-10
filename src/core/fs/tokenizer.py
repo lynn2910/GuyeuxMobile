@@ -11,12 +11,14 @@ class TokenType(Enum):
     BEDGE = "BEDGE"
 
     SIMULATION = "SIMULATION"
+    VEHICLES = "VEHICLES"  # Nouveau token
     CAR = "CAR"
 
     LPAREN = "LPAREN"
     RPAREN = "RPAREN"
     COLON = "COLON"
     COMMA = "COMMA"
+    EQUALS = "EQUALS"
 
     IDENTIFIER = "IDENTIFIER"
     NUMBER = "NUMBER"
@@ -99,6 +101,7 @@ class Tokenizer:
             "UEDGE": TokenType.UEDGE,
             "BEDGE": TokenType.BEDGE,
             "SIMULATION": TokenType.SIMULATION,
+            "VEHICLES": TokenType.VEHICLES,  # Mapping du mot-clé
             "CAR": TokenType.CAR,
         }
 
@@ -129,6 +132,9 @@ class Tokenizer:
                 self.advance()
             elif char == ',':
                 self.tokens.append(Token(TokenType.COMMA, ',', self.line, col))
+                self.advance()
+            elif char == '=':
+                self.tokens.append(Token(TokenType.EQUALS, '=', self.line, col))
                 self.advance()
             elif char.isdigit() or (char == '-' and self.peek_char() and self.peek_char().isdigit()):
                 self.tokens.append(self.read_number())

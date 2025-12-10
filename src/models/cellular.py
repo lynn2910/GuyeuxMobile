@@ -103,8 +103,8 @@ class CellularEdge(BaseEdge):
         queue_size = self.entry_queue.qsize()
 
         infos = [
-            f"Vmax:       {self.vmax}",
-            f"Prob slow:  {self.prob_slow:.2f}",
+            f"Vmax:       {self.vmax * 10} Km/h",
+            f"Prob slow:  {int(self.prob_slow * 100)}%",
             f"Vehicles:   {num_vehicles}/{self.distance}",
         ]
 

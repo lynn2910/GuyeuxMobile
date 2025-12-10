@@ -1,10 +1,42 @@
 GRAPH(cellular):
-    NODE A (0,0)
-    NODE B (10,20)
-    NODE C (10, 30)
-    UEDGE A B
-    UEDGE B C
+    NODE GARE (300, 200)
+    NODE ALSTOM (100, 300)
 
-SIMULATION:
-    CAR 1 (A, C)
-    CAR 2 (A, C)
+    NODE PLACE_CORBIS (600, 500)
+    NODE THEATRE (500, 550)
+    NODE FAUBOURG_DE_FRANCE (450, 350)
+
+    NODE IUT (200, 700)
+    NODE TECHN_HOM (300, 800)
+
+    NODE MARCHE_VOSGES (600, 800)
+
+    NODE PLACE_ARMES (800, 600)
+    NODE LION (900, 700)
+    NODE CITADELLE (950, 600)
+    NODE ETANG_FORGES (900, 900)
+
+
+    BEDGE GARE FAUBOURG_DE_FRANCE distance=250 vmax=5 prob_slow=0.1
+    BEDGE FAUBOURG_DE_FRANCE PLACE_CORBIS distance=250 vmax=5 prob_slow=0.2
+
+    BEDGE ALSTOM GARE distance=300 vmax=5 prob_slow=0.1
+
+    BEDGE IUT TECHN_HOM distance=200 vmax=5 prob_slow=0.1
+    BEDGE TECHN_HOM MARCHE_VOSGES distance=400 vmax=5 prob_slow=0.05
+    BEDGE MARCHE_VOSGES PLACE_CORBIS distance=300 vmax=5 prob_slow=0.2
+
+    BEDGE IUT ALSTOM distance=500 vmax=5 prob_slow=0.05
+
+    BEDGE PLACE_CORBIS THEATRE distance=150 vmax=5 prob_slow=0.3
+    BEDGE PLACE_CORBIS PLACE_ARMES distance=300 vmax=5 prob_slow=0.2
+
+    UEDGE PLACE_ARMES LION distance=200 vmax=5 prob_slow=0.5
+    UEDGE LION CITADELLE distance=100 vmax=5 prob_slow=0.6
+
+    UEDGE CITADELLE PLACE_ARMES distance=250 vmax=5 prob_slow=0.4
+
+    BEDGE MARCHE_VOSGES ETANG_FORGES distance=450 vmax=5 prob_slow=0.05
+    BEDGE PLACE_ARMES ETANG_FORGES distance=400 vmax=5 prob_slow=0.1
+
+VEHICLES:

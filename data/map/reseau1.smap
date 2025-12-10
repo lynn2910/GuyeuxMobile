@@ -1,51 +1,53 @@
 GRAPH(cellular):
+    NODE H_NW (100, 900)
+    NODE H_NE (900, 900)
+    NODE H_SE (900, 100)
+    NODE H_SW (100, 100)
 
-    NODE H_NW (10, 90)
-    NODE H_NE (90, 90)
-    NODE H_SE (90, 10)
-    NODE H_SW (10, 10)
+    NODE N_Entrance (500, 900)
+    NODE E_Entrance (900, 500)
+    NODE S_Entrance (500, 100)
+    NODE W_Entrance (100, 500)
 
-    NODE N_Entrance (50, 90)
-    NODE E_Entrance (90, 50)
-    NODE S_Entrance (50, 10)
-    NODE W_Entrance (10, 50)
+    NODE CENTER (500, 500)
+    NODE AVE_N (500, 700)
+    NODE AVE_E (700, 500)
+    NODE AVE_S (500, 300)
+    NODE AVE_W (300, 500)
 
-    NODE CENTER (50, 50)
-    NODE AVE_N (50, 70)
-    NODE AVE_E (70, 50)
-    NODE AVE_S (50, 30)
-    NODE AVE_W (30, 50)
+    NODE RES_1 (200, 800)
+    NODE RES_2 (800, 200)
 
-    NODE RES_1 (20, 80)
-    NODE RES_2 (80, 20)
+    UEDGE H_NW N_Entrance distance=400 vmax=15 prob_slow=0.1
+    UEDGE N_Entrance H_NE distance=400 vmax=15 prob_slow=0.1
+    UEDGE H_NE E_Entrance distance=400 vmax=15 prob_slow=0.1
+    UEDGE E_Entrance H_SE distance=400 vmax=15 prob_slow=0.1
+    UEDGE H_SE S_Entrance distance=400 vmax=15 prob_slow=0.1
+    UEDGE S_Entrance H_SW distance=400 vmax=15 prob_slow=0.1
+    UEDGE H_SW W_Entrance distance=400 vmax=15 prob_slow=0.1
+    UEDGE W_Entrance H_NW distance=400 vmax=15 prob_slow=0.1
 
-    UEDGE H_NW N_Entrance
-    UEDGE N_Entrance H_NE
-    UEDGE H_NE E_Entrance
-    UEDGE E_Entrance H_SE
-    UEDGE H_SE S_Entrance
-    UEDGE S_Entrance H_SW
-    UEDGE H_SW W_Entrance
-    UEDGE W_Entrance H_NW
+    UEDGE N_Entrance AVE_N distance=200 vmax=11 prob_slow=0.2
+    UEDGE AVE_N N_Entrance distance=200 vmax=11 prob_slow=0.2
 
-    UEDGE N_Entrance AVE_N
-    UEDGE AVE_N N_Entrance
-    UEDGE E_Entrance AVE_E
-    BEDGE AVE_E E_Entrance
-    UEDGE S_Entrance AVE_S
-    UEDGE AVE_S S_Entrance
-    UEDGE W_Entrance AVE_W
-    UEDGE AVE_W W_Entrance
+    UEDGE E_Entrance AVE_E distance=200 vmax=11 prob_slow=0.2
+    BEDGE AVE_E E_Entrance distance=200 vmax=11 prob_slow=0.2
 
-    BEDGE AVE_N CENTER
-    BEDGE AVE_E CENTER
-    BEDGE AVE_S CENTER
-    BEDGE AVE_W CENTER
+    UEDGE S_Entrance AVE_S distance=200 vmax=11 prob_slow=0.2
+    UEDGE AVE_S S_Entrance distance=200 vmax=11 prob_slow=0.2
 
-    BEDGE AVE_W RES_1
-    BEDGE AVE_E RES_2
+    UEDGE W_Entrance AVE_W distance=200 vmax=11 prob_slow=0.2
+    UEDGE AVE_W W_Entrance distance=200 vmax=11 prob_slow=0.2
 
-SIMULATION:
+    BEDGE AVE_N CENTER distance=200 vmax=8 prob_slow=0.3
+    BEDGE AVE_E CENTER distance=200 vmax=8 prob_slow=0.3
+    BEDGE AVE_S CENTER distance=200 vmax=8 prob_slow=0.3
+    BEDGE AVE_W CENTER distance=200 vmax=8 prob_slow=0.3
+
+    BEDGE AVE_W RES_1 distance=300 vmax=5 prob_slow=0.4
+    BEDGE AVE_E RES_2 distance=300 vmax=5 prob_slow=0.4
+
+VEHICLES:
     CAR 1 (H_NW, H_SE)
     CAR 2 (H_SW, H_NE)
     CAR 3 (RES_1, RES_2)

@@ -5,12 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="34ca026d-ff22-4622-8518-3eb132e69b03" name="Changes" comment="feat: Add basic visualization">
-      <change afterPath="$PROJECT_DIR$/src/ui/camera.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ui/geometry.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ui/renderer.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ui/styles.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/simulation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/simulation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/map/belfort.smap" beforeDir="false" afterPath="$PROJECT_DIR$/data/map/belfort.smap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/map/reseau1.smap" beforeDir="false" afterPath="$PROJECT_DIR$/data/map/reseau1.smap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/results/belfort.png" beforeDir="false" afterPath="$PROJECT_DIR$/data/results/belfort.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/fs/parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/fs/parser.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/fs/tokenizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/fs/tokenizer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/cellular.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/cellular.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ui/renderer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ui/renderer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ui/styles.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ui/styles.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ui/visualizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ui/visualizer.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -57,6 +60,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.Belfort.executor": "Run",
     "Python.Main.executor": "Run",
     "Python.TEst (no visualizer).executor": "Run",
     "Python.TEst.executor": "Run",
@@ -78,8 +82,8 @@
       <recent name="R:\IUT_Code\S5\Modelisation_math\src\entities" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.TEst">
-    <configuration name="TEst (no visualizer)" type="PythonConfigurationType" factoryName="Python">
+  <component name="RunManager" selected="Python.Belfort">
+    <configuration name="Belfort (no visualizer)" type="PythonConfigurationType" factoryName="Python">
       <module name="Modelisation_math" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -95,7 +99,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/main.py" />
-      <option name="PARAMETERS" value="--map .\data\map\reseau1.smap --tps 1 --debug" />
+      <option name="PARAMETERS" value="--map .\data\map\belfort.smap --tps 30 --debug" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -103,7 +107,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="TEst" type="PythonConfigurationType" factoryName="Python">
+    <configuration name="Belfort" type="PythonConfigurationType" factoryName="Python">
       <module name="Modelisation_math" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -119,7 +123,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/main.py" />
-      <option name="PARAMETERS" value="--map .\data\map\reseau1.smap --tps 1 --visualizer" />
+      <option name="PARAMETERS" value="--map .\data\map\belfort.smap --tps 1 --visualizer" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -128,8 +132,8 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.TEst (no visualizer)" />
-      <item itemvalue="Python.TEst" />
+      <item itemvalue="Python.Belfort (no visualizer)" />
+      <item itemvalue="Python.Belfort" />
     </list>
   </component>
   <component name="SharedIndexes">
@@ -233,6 +237,6 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Modelisation_math$TEst__no_visualizer_.coverage" NAME="TEst (no visualizer) Coverage Results" MODIFIED="1765371151223" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
     <SUITE FILE_PATH="coverage/Modelisation_math$Main.coverage" NAME="TEst Coverage Results" MODIFIED="1764618729521" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
-    <SUITE FILE_PATH="coverage/Modelisation_math$TEst.coverage" NAME="TEst Coverage Results" MODIFIED="1765380795074" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
+    <SUITE FILE_PATH="coverage/Modelisation_math$TEst.coverage" NAME="Belfort Coverage Results" MODIFIED="1765383728562" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
   </component>
 </project>
