@@ -35,14 +35,13 @@ class Simulation:
         The main loop of the simulation.
         :return:
         """
-        print(self.since_last_update)
         start_time = time()
 
         is_a_sim_update_tick = False
         if self.since_last_update >= self.tps:
             self.t += 1
             print(f"------ Tick {self.t} ------")
-            
+
             self.internal_step()
             self.since_last_update = 0
             is_a_sim_update_tick = True

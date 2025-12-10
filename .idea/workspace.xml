@@ -4,16 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="34ca026d-ff22-4622-8518-3eb132e69b03" name="Changes" comment="feat: Generate graph at map loading">
-      <change afterPath="$PROJECT_DIR$/src/ui/visualizer.py" afterDir="false" />
+    <list default="true" id="34ca026d-ff22-4622-8518-3eb132e69b03" name="Changes" comment="feat: Add basic visualization">
+      <change afterPath="$PROJECT_DIR$/src/ui/camera.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/ui/geometry.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/ui/renderer.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/ui/styles.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/cli.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/cli.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/simulation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/simulation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/cellular.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/cellular.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ui/visualizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ui/visualizer.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,6 +58,7 @@
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "Python.Main.executor": "Run",
+    "Python.TEst (no visualizer).executor": "Run",
     "Python.TEst.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
@@ -70,7 +69,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "settings.editor.selected.configurable": "editing.templates",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -79,7 +78,31 @@
       <recent name="R:\IUT_Code\S5\Modelisation_math\src\entities" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.TEst">
+    <configuration name="TEst (no visualizer)" type="PythonConfigurationType" factoryName="Python">
+      <module name="Modelisation_math" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.13 (Modelisation_math)" />
+      <option name="WORKING_DIRECTORY" value="R:\IUT_Code\S5\Modelisation_math" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/main.py" />
+      <option name="PARAMETERS" value="--map .\data\map\reseau1.smap --tps 1 --debug" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="TEst" type="PythonConfigurationType" factoryName="Python">
       <module name="Modelisation_math" />
       <option name="ENV_FILES" value="" />
@@ -104,12 +127,16 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Python.TEst (no visualizer)" />
+      <item itemvalue="Python.TEst" />
+    </list>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-PY-252.27397.106" />
-        <option value="bundled-python-sdk-4e2b1448bda8-9a97661f3031-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.27397.106" />
+        <option value="bundled-js-predefined-d6986cc7102b-a71380e98a7c-JavaScript-PY-252.28238.29" />
+        <option value="bundled-python-sdk-a101402ee41c-968fe969f28a-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.28238.29" />
       </set>
     </attachedChunks>
   </component>
@@ -125,7 +152,9 @@
       <workItem from="1764338873196" duration="1484000" />
       <workItem from="1764340673817" duration="3126000" />
       <workItem from="1764343849061" duration="3396000" />
-      <workItem from="1764616714409" duration="2010000" />
+      <workItem from="1764616714409" duration="2098000" />
+      <workItem from="1765371026817" duration="990000" />
+      <workItem from="1765380302227" duration="796000" />
     </task>
     <task id="LOCAL-00001" summary="feat: Add parser with a syntax for map declaration">
       <option name="closed" value="true" />
@@ -167,7 +196,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764346832191</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="feat: Add basic visualization">
+      <option name="closed" value="true" />
+      <created>1764618789924</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1764618789924</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -179,7 +216,8 @@
     <MESSAGE value="feat: Error handling" />
     <MESSAGE value="fix: Cellular model was supressing some cars (oops)" />
     <MESSAGE value="feat: Generate graph at map loading" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: Generate graph at map loading" />
+    <MESSAGE value="feat: Add basic visualization" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: Add basic visualization" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -193,6 +231,8 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Modelisation_math$Main.coverage" NAME="TEst Coverage Results" MODIFIED="1764618713012" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
+    <SUITE FILE_PATH="coverage/Modelisation_math$TEst__no_visualizer_.coverage" NAME="TEst (no visualizer) Coverage Results" MODIFIED="1765371151223" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
+    <SUITE FILE_PATH="coverage/Modelisation_math$Main.coverage" NAME="TEst Coverage Results" MODIFIED="1764618729521" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
+    <SUITE FILE_PATH="coverage/Modelisation_math$TEst.coverage" NAME="TEst Coverage Results" MODIFIED="1765380795074" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
   </component>
 </project>
