@@ -47,10 +47,11 @@ def run_simulation_from_file(file_path: str, tps: float = 0.5, show_viz: bool = 
     init_required_files_and_folders()
 
     print(f"Loading configuration from '{file_path}'...\n")
-    graph, vehicles = import_map(file_path)
+    graph, vehicles, spawners = import_map(file_path)
 
     print(f"Graph loaded: {len(graph.graph.nodes)} nodes, {len(graph.graph.edges)} edges")
     print(f"Vehicles loaded: {len(vehicles)}")
+    print(f"Spawners loaded: {len(spawners)}")
 
     print("\n----- Generate graph -----")
     file_name = path.basename(file_path).replace(".smap", "")
@@ -61,6 +62,8 @@ def run_simulation_from_file(file_path: str, tps: float = 0.5, show_viz: bool = 
         viz = Visualizer(graph, 800, 500)
 
     simulation = Simulation(graph, tps, visualizer=viz)
+
+    simulation.spawners = spawners
 
     print("\n----- Vehicles -----")
     for vehicle, start_edge in vehicles:

@@ -11,8 +11,11 @@ class TokenType(Enum):
     BEDGE = "BEDGE"
 
     SIMULATION = "SIMULATION"
-    VEHICLES = "VEHICLES"  # Nouveau token
+    VEHICLES = "VEHICLES"
     CAR = "CAR"
+
+    SPAWNERS = "SPAWNERS"
+    SPAWNER = "SPAWNER"
 
     LPAREN = "LPAREN"
     RPAREN = "RPAREN"
@@ -101,8 +104,10 @@ class Tokenizer:
             "UEDGE": TokenType.UEDGE,
             "BEDGE": TokenType.BEDGE,
             "SIMULATION": TokenType.SIMULATION,
-            "VEHICLES": TokenType.VEHICLES,  # Mapping du mot-clé
+            "VEHICLES": TokenType.VEHICLES,
             "CAR": TokenType.CAR,
+            "SPAWNERS": TokenType.SPAWNERS,
+            "SPAWNER": TokenType.SPAWNER,
         }
 
         token_type = keywords.get(ident, TokenType.IDENTIFIER)

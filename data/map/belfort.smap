@@ -31,12 +31,16 @@ GRAPH(cellular):
     BEDGE PLACE_CORBIS THEATRE distance=150 vmax=5 prob_slow=0.3
     BEDGE PLACE_CORBIS PLACE_ARMES distance=300 vmax=5 prob_slow=0.2
 
-    UEDGE PLACE_ARMES LION distance=200 vmax=5 prob_slow=0.5
-    UEDGE LION CITADELLE distance=100 vmax=5 prob_slow=0.6
+    UEDGE PLACE_ARMES LION distance=200 vmax=3 prob_slow=0.5
+    UEDGE LION CITADELLE distance=100 vmax=3 prob_slow=0.6
 
-    UEDGE CITADELLE PLACE_ARMES distance=250 vmax=5 prob_slow=0.4
+    UEDGE CITADELLE PLACE_ARMES distance=250 vmax=3 prob_slow=0.4
 
     BEDGE MARCHE_VOSGES ETANG_FORGES distance=450 vmax=5 prob_slow=0.05
     BEDGE PLACE_ARMES ETANG_FORGES distance=400 vmax=5 prob_slow=0.1
 
 VEHICLES:
+
+SPAWNERS:
+    SPAWNER GARE ratio=0.1
+    SPAWNER IUT ratio=0.05
