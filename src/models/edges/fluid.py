@@ -1,4 +1,3 @@
-# models/fluid.py
 from models.edges.base_edge import BaseEdge
 from entities.vehicle import Vehicle
 import random
@@ -6,95 +5,100 @@ import random
 
 class FluidEdge(BaseEdge):
     def __init__(self, distance: int, vmax: int, density_max: float = 0.2):
-        """
-        Initialise une arête fluide (Modèle Lighthill-Whitham-Richards simplifié).
-        :param distance: Longueur de la route en mètres.
-        :param vmax: Vitesse maximale (m/tick).
-        :param density_max: Densité maximale (véhicules/mètre). 0.2 ~= 1 voiture tous les 5m.
-        """
         super().__init__(distance)
         self.vmax = float(vmax)
         self.density_max = density_max
-
-        # Capacité max théorique (Jam density)
         self.max_vehicles = int(self.distance * self.density_max)
-
-        # Stockage : Liste des véhicules présents et dictionnaire de leurs positions
         self.vehicles = []
-        self.positions = {}  # {vehicle_id: float_position}
+        self.positions = {}
 
     def insert_vehicle(self, vehicle: Vehicle):
-        """
-        Tente d'insérer un véhicule au début de l'arête.
-        Retourne True si succès, False si l'arête est saturée.
-        """
         if len(self.vehicles) >= self.max_vehicles:
-            # Route saturée, on refuse l'insertion
             return False
 
         self.vehicles.append(vehicle)
         self.positions[vehicle.id] = 0.0
-        vehicle.speed = 0  # Sera mis à jour au prochain update
+        vehicle.speed = 0
         return True
 
-    def update(self) -> list:
-        """
-        Mise à jour selon le modèle de Greenshields avec vitesse minimale garantie.
-        """
-        exiting = []
-
-        # 1. Calcul de la densité actuelle (k)
+    def update(self) -> None:
         count = len(self.vehicles)
         if count == 0:
-            return exiting
+            return
 
+        # On triche un peu : on considère que la densité impacte la vitesse
+        # moins vite au début pour garder du flux, puis chute brutalement.
         density = count / self.distance
 
-        # --- CORRECTION ICI ---
-        # On calcule le facteur de ralentissement (1.0 = fluide, 0.0 = bouché)
-        speed_factor = 1.0 - (density / self.density_max)
+        # Courbe de vitesse moins linéaire (permet de rouler un peu même si dense)
+        # v = vmax * (1 - (rho/rho_max)^2)
+        ratio = density / self.density_max
+        speed_factor = max(0.0, 1.0 - (ratio ** 2))
 
-        # On empêche le facteur de tomber à 0 absolu.
-        # On garde toujours au moins 5% ou 10% de la vitesse (vitesse de "crawl")
-        # Sinon le bouchon ne se résorbe jamais.
-        speed_factor = max(0.1, speed_factor)
-
-        # 2. Calcul de la vitesse globale
         current_speed = self.vmax * speed_factor
 
-        # 3. Mise à jour des positions
-        # On itère sur une copie pour pouvoir modifier la liste originale sans bug
-        for vehicle in list(self.vehicles):
+        # Tri pour gérer les collisions
+        sorted_vehicles = sorted(self.vehicles, key=lambda v: self.positions[v.id], reverse=True)
+
+        for i, vehicle in enumerate(sorted_vehicles):
             current_pos = self.positions[vehicle.id]
 
-            # Variance : plus naturelle.
-            # On évite que des voitures doublent trop violemment dans un bouchon.
-            if speed_factor < 0.3:
-                # Dans les bouchons, variance faible (tout le monde se suit)
-                variance = random.uniform(0.9, 1.1)
-            else:
-                # Fluide, variance plus libre
-                variance = random.uniform(0.85, 1.15)
-
-            # Vitesse finale du véhicule pour ce tick
+            # Variance plus faible dans les bouchons
+            variance = random.uniform(0.9, 1.1) if speed_factor > 0.2 else 1.0
             veh_speed = current_speed * variance
-            vehicle.speed = veh_speed  # Mise à jour pour le visualiseur
 
-            # Nouvelle position
             new_pos = current_pos + veh_speed
 
-            if new_pos >= self.distance:
-                # Le véhicule sort
-                exiting.append(vehicle)
-                self.vehicles.remove(vehicle)
-                del self.positions[vehicle.id]
-            else:
-                self.positions[vehicle.id] = new_pos
+            # 1. Limite : Fin de la route
+            if new_pos > self.distance:
+                new_pos = self.distance
+                veh_speed = 0
 
-        return exiting
+                # 2. Limite : Véhicule de devant (Collisions)
+            if i > 0:
+                leader = sorted_vehicles[i - 1]
+                leader_pos = self.positions[leader.id]
+
+                # --- MODIFICATION ICI ---
+                # Distance de sécurité réduite à 0.5m (au lieu de 1m)
+                # Cela permet de tasser visuellement les voitures
+                safe_distance = 0.5
+
+                if new_pos >= leader_pos - safe_distance:
+                    new_pos = leader_pos - safe_distance
+                    veh_speed = 0
+
+            self.positions[vehicle.id] = new_pos
+            vehicle.speed = veh_speed
+
+    def has_vehicle_at_exit(self) -> bool:
+        # On cherche s'il y a au moins un véhicule 'collé' à la fin
+        # Avec les flottants, on prend une petite marge (ex: > distance - 0.5)
+        for v in self.vehicles:
+            if self.positions[v.id] >= self.distance - 0.5:
+                return True
+        return False
+
+    def peek_last_vehicle(self):
+        # Retourne le véhicule le plus avancé s'il est à la sortie
+        if not self.vehicles:
+            return None
+
+        # Le véhicule le plus avancé
+        leader = max(self.vehicles, key=lambda v: self.positions[v.id])
+        if self.positions[leader.id] >= self.distance - 0.5:
+            return leader
+        return None
+
+    def pop_last_vehicle(self):
+        leader = self.peek_last_vehicle()
+        if leader:
+            self.vehicles.remove(leader)
+            del self.positions[leader.id]
+            return leader
+        return None
 
     def get_vehicle_positions(self):
-        """Retourne un itérateur de (Vehicle, position_ratio 0..1) pour le rendu"""
         for v in self.vehicles:
             ratio = self.positions[v.id] / self.distance
             yield v, ratio
@@ -103,7 +107,6 @@ class FluidEdge(BaseEdge):
         count = len(self.vehicles)
         density = count / self.distance if self.distance > 0 else 0
         speed = self.vmax * (1.0 - (density / self.density_max)) if self.density_max > 0 else 0
-
         infos = [
             f"Type:       Fluide (LWR)",
             f"Vmax:       {self.vmax:.1f} m/t",
@@ -114,30 +117,16 @@ class FluidEdge(BaseEdge):
         ]
         return infos
 
+    def get_occupation_ratio(self) -> float:
+        return len(self.vehicles) / max(self.max_vehicles, 1)
+
     @staticmethod
     def evaluate_weight(src, dst, data):
-        """
-        Pour le pathfinding, le poids est dynamique selon la congestion.
-        """
         edge = data['object']
         base_cost = edge.distance
-
-        # Pénalité de congestion : Coût = Distance / Vitesse_Actuelle
         count = len(edge.vehicles)
-
-        if count == 0:
-            return base_cost / edge.vmax  # Temps minimal
+        if count == 0: return base_cost / edge.vmax
 
         density = count / edge.distance
-        speed_factor = 1.0 - (density / edge.density_max)
-
-        # Éviter division par zéro
-        if speed_factor <= 0.01:
-            speed_factor = 0.01
-
-        # Coût = distance / vitesse effective
+        speed_factor = max(0.01, 1.0 - (density / edge.density_max))
         return base_cost / (edge.vmax * speed_factor)
-
-    def get_occupation_ratio(self) -> float:
-        """Retourne le ratio d'occupation normalisé [0,1]"""
-        return len(self.vehicles) / max(self.max_vehicles, 1)
