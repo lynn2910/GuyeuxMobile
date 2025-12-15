@@ -49,3 +49,7 @@ class BaseEdge:
         :return: The calculated weight
         """
         raise NotImplementedError
+
+    def get_occupation_ratio(self) -> float:
+        """Retourne un ratio d'occupation normalisé [0,1]"""
+        raise NotImplementedError

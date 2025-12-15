@@ -1,8 +1,10 @@
 import random
 import uuid
+
 from core.graph import RoadGraph
 from entities.vehicle import Vehicle
 from models.cellular import CellularEdge
+from cli import debug_log
 
 
 class VehicleSpawner:
@@ -22,41 +24,39 @@ class VehicleSpawner:
         if random.random() > self.spawn_ratio:
             return None
 
-        print("Spawning a vehicle...")
+        debug_log("Spawning a vehicle...")
 
         all_nodes = list(graph.graph.nodes)
 
         possible_destinations = [n for n in all_nodes if n != self.node]
 
-        print(possible_destinations)
+        debug_log(possible_destinations)
 
         if not possible_destinations:
-            print("no possible_destinations")
+            debug_log("no possible_destinations")
             return None
 
         destination = random.choice(possible_destinations)
-        print(destination)
+        debug_log(destination)
 
         path = graph.get_path(self.node, destination, CellularEdge.evaluate_weight)
-        print(path)
+        debug_log(path)
 
         if not path or len(path) < 2:
-            print("no path")
+            debug_log("no path")
             return None
 
         veh_id = f"auto_{str(uuid.uuid4())[:5]}"
-        print(veh_id)
+        debug_log(veh_id)
 
         vehicle = Vehicle(vehicle_id=veh_id, path=path[1:])
 
         next_node = path[1]
         start_edge = graph.get_edge(self.node, next_node)
-        print(next_node)
-        print(start_edge)
 
         if start_edge:
             start_edge.insert_vehicle(vehicle)
-            print(f"Spawn: {veh_id} from {self.node} to {destination}")
+            debug_log(f"Spawn: {veh_id} from {self.node} to {destination}")
             return vehicle
 
         return None

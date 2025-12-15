@@ -1,0 +1,45 @@
+GRAPH(fluid):
+    NODE GARE (300, 200)
+    NODE ALSTOM (100, 300)
+    NODE PLACE_CORBIS (600, 500)
+    NODE THEATRE (500, 550)
+    NODE FAUBOURG_DE_FRANCE (450, 350)
+    NODE IUT (200, 700)
+    NODE TECHN_HOM (300, 800)
+    NODE MARCHE_VOSGES (600, 800)
+    NODE PLACE_ARMES (800, 600)
+    NODE LION (900, 700)
+    NODE CITADELLE (950, 600)
+    NODE ETANG_FORGES (900, 900)
+
+    BEDGE GARE FAUBOURG_DE_FRANCE distance=40 vmax=4 density_max=0.2
+
+    BEDGE FAUBOURG_DE_FRANCE PLACE_CORBIS distance=30 vmax=3 density_max=0.12
+
+    BEDGE ALSTOM GARE distance=50 vmax=5 density_max=0.2
+    BEDGE IUT ALSTOM distance=80 vmax=6 density_max=0.2
+
+    BEDGE IUT TECHN_HOM distance=25 vmax=4 density_max=0.2
+    BEDGE TECHN_HOM MARCHE_VOSGES distance=50 vmax=5 density_max=0.2
+
+    BEDGE MARCHE_VOSGES PLACE_CORBIS distance=35 vmax=4 density_max=0.18
+
+    BEDGE PLACE_CORBIS THEATRE distance=15 vmax=2 density_max=0.1
+    BEDGE PLACE_CORBIS PLACE_ARMES distance=35 vmax=3 density_max=0.15
+
+    UEDGE PLACE_ARMES LION distance=20 vmax=2 density_max=0.1
+    UEDGE LION CITADELLE distance=15 vmax=1 density_max=0.08    UEDGE CITADELLE PLACE_ARMES distance=30 vmax=2 density_max=0.1
+
+    BEDGE MARCHE_VOSGES ETANG_FORGES distance=60 vmax=5 density_max=0.25
+    BEDGE PLACE_ARMES ETANG_FORGES distance=50 vmax=5 density_max=0.25
+
+VEHICLES:
+
+SPAWNERS:
+    SPAWNER GARE ratio=0.1
+    SPAWNER ETANG_FORGES ratio=0.1
+    SPAWNER ALSTOM ratio=0.05
+    SPAWNER IUT ratio=0.05
+    SPAWNER TECHN_HOM ratio=0.05
+    SPAWNER CITADELLE ratio=0.02
+    SPAWNER MARCHE_VOSGES ratio=0.05

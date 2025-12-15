@@ -5,6 +5,7 @@ from core.graph import RoadGraph
 from entities.vehicle import Vehicle
 from entities.vehicle_spawner import VehicleSpawner
 from models.cellular import CellularEdge
+from models.fluid import FluidEdge
 
 
 class Parser:
@@ -178,34 +179,49 @@ def import_map(file_path: str):
 
 def build_graph(graph_data: dict) -> RoadGraph:
     graph = RoadGraph()
-    graph_type = graph_data["type"]
+    graph_type = graph_data["type"]  # "cellular" ou "fluid"
 
     for node_id, (x, y) in graph_data["nodes"].items():
         graph.add_node(node_id, x, y)
 
     for edge_type, from_node, to_node, params in graph_data["edges"]:
+        x1, y1 = graph_data["nodes"][from_node]
+        x2, y2 = graph_data["nodes"][to_node]
+        default_distance = ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5
+
+        distance = float(params.get("distance", default_distance))
+        vmax = int(params.get("vmax", 5))
+
+        # Paramètres spécifiques
+        prob_slow = float(params.get("prob_slow", 0.1))
+        density_max = float(params.get("density_max", 0.2))  # Nouveau paramètre
+
+        edge_obj = None
+        edge_obj_back = None
+
+        # --- SÉLECTION DU MODÈLE ---
         if graph_type == "cellular":
-            x1, y1 = graph_data["nodes"][from_node]
-            x2, y2 = graph_data["nodes"][to_node]
-            default_distance = ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5
-
-            distance = float(params.get("distance", default_distance))
-            vmax = int(params.get("vmax", 5))
-            prob_slow = float(params.get("prob_slow", 0.1))
-
             if edge_type == TokenType.UEDGE:
-                edge = CellularEdge(distance=int(distance), vmax=vmax, prob_slow=prob_slow)
-                graph.add_edge(from_node, to_node, edge)
-
+                edge_obj = CellularEdge(distance=int(distance), vmax=vmax, prob_slow=prob_slow)
             elif edge_type == TokenType.BEDGE:
-                edge_forward = CellularEdge(distance=int(distance), vmax=vmax, prob_slow=prob_slow)
-                edge_backward = CellularEdge(distance=int(distance), vmax=vmax, prob_slow=prob_slow)
+                edge_obj = CellularEdge(distance=int(distance), vmax=vmax, prob_slow=prob_slow)
+                edge_obj_back = CellularEdge(distance=int(distance), vmax=vmax, prob_slow=prob_slow)
 
-                graph.add_edge(from_node, to_node, edge_forward)
-                graph.add_edge(to_node, from_node, edge_backward)
+        elif graph_type == "fluid":
+            if edge_type == TokenType.UEDGE:
+                edge_obj = FluidEdge(distance=int(distance), vmax=vmax, density_max=density_max)
+            elif edge_type == TokenType.BEDGE:
+                edge_obj = FluidEdge(distance=int(distance), vmax=vmax, density_max=density_max)
+                edge_obj_back = FluidEdge(distance=int(distance), vmax=vmax, density_max=density_max)
 
         else:
-            raise SyntaxError(f"Invalid edge type given for the graph : {graph_type}")
+            raise SyntaxError(f"Unknown graph type: {graph_type}")
+
+        # Ajout au graph
+        if edge_obj:
+            graph.add_edge(from_node, to_node, edge_obj)
+        if edge_obj_back:
+            graph.add_edge(to_node, from_node, edge_obj_back)
 
     return graph
 

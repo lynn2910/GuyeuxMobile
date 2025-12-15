@@ -119,3 +119,6 @@ class CellularEdge(BaseEdge):
     @staticmethod
     def evaluate_weight(src, dst, data):
         return data['object'].distance
+
+    def get_occupation_ratio(self) -> float:
+        return sum(1 for c in self.cells if c) / self.distance

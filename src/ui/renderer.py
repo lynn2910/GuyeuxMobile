@@ -87,28 +87,40 @@ class Renderer:
         self._draw_vehicles(start_draw, end_draw, edge, zoom)
 
     def _draw_vehicles(self, start_pos: Tuple[float, float], end_pos: Tuple[float, float], edge, zoom: float):
-        if not hasattr(edge, 'cells'):
-            return
-
         vehicle_radius = int(max(3, min(8, int(Sizes.VEHICLE_RADIUS * zoom))))
 
-        for i, cell in enumerate(edge.cells):
-            if cell is not None:
-                # Linear interpolation for position
-                t = (i + 0.5) / edge.distance
-                x = start_pos[0] + t * (end_pos[0] - start_pos[0])
-                y = start_pos[1] + t * (end_pos[1] - start_pos[1])
+        vehicle_iterator = []
 
-                # Draw vehicle
-                pygame.draw.circle(self.screen, Colors.VEHICLE, (int(x), int(y)), vehicle_radius)
+        if hasattr(edge, 'cells'):
+            for i, cell in enumerate(edge.cells):
+                if cell is not None:
+                    t = (i + 0.5) / edge.distance
+                    vehicle_iterator.append(t)
 
-    def _get_traffic_color(self, edge) -> Tuple[int, int, int]:
-        if not hasattr(edge, 'cells'):
-            return Colors.ROAD_BASE
+        elif hasattr(edge, 'get_vehicle_positions'):
+            for _, ratio in edge.get_vehicle_positions():
+                vehicle_iterator.append(ratio)
 
-        num_vehicles = sum(1 for cell in edge.cells if cell is not None)
-        occupation = num_vehicles / max(edge.distance, 1)
+        # Dessin commun
+        for t in vehicle_iterator:
+            x = start_pos[0] + t * (end_pos[0] - start_pos[0])
+            y = start_pos[1] + t * (end_pos[1] - start_pos[1])
+            pygame.draw.circle(self.screen, Colors.VEHICLE, (int(x), int(y)), vehicle_radius)
 
+    @staticmethod
+    def _get_traffic_color(edge) -> Tuple[int, int, int]:
+        occupation = 0.0
+
+        # Calcul occupation selon le modèle
+        if hasattr(edge, 'cells'):
+            num_vehicles = sum(1 for cell in edge.cells if cell is not None)
+            occupation = num_vehicles / max(edge.distance, 1)
+
+        elif hasattr(edge, 'vehicles') and hasattr(edge, 'max_vehicles'):
+            # Modèle fluide
+            occupation = len(edge.vehicles) / max(edge.max_vehicles, 1)
+
+        # Logique de couleur identique
         if occupation < 0.3:
             t = occupation / 0.3
             return lerp_color(Colors.TRAFFIC_LOW, Colors.TRAFFIC_MEDIUM, t)
