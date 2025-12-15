@@ -135,7 +135,6 @@ class Visualizer:
 
     def _render(self):
         self.renderer.clear()
-
         zoom_level = self.camera.zoom
 
         # 1. Draw Edges
@@ -160,6 +159,10 @@ class Visualizer:
             is_entrance = "entrance" in node_id.lower() or "source" in node_id.lower()
 
             self.renderer.draw_node(screen_pos, node_id, is_hovered, is_entrance, zoom_level)
+
+        # --- NOUVEAU : Dessiner les feux ---
+        # On passe self.camera.world_to_screen comme fonction de conversion
+        self.renderer.draw_traffic_lights(self.graph, self.camera.world_to_screen, zoom_level)
 
         # 3. UI Overlays
         self.renderer.draw_tick_counter(self.current_tick)

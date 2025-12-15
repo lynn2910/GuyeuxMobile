@@ -35,6 +35,14 @@ class Colors:
     INFO_BG = (255, 255, 255, 230)
     INFO_BORDER = (200, 200, 200)
 
+    BACKGROUND = (30, 30, 30)
+    NODE = (200, 200, 200)
+    EDGE = (50, 50, 50)
+
+    TL_RED = (255, 50, 50)
+    TL_GREEN = (50, 255, 50)
+    TL_OUTLINE = (20, 20, 20)
+
 
 class Sizes:
     """Size constants for visual elements"""
@@ -50,6 +58,8 @@ class Sizes:
 
     # Vehicles
     VEHICLE_RADIUS = 4
+
+    TRAFFIC_LIGHT_RADIUS = 3
 
     # UI
     ARROW_SIZE = 10

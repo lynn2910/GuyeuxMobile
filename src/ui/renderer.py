@@ -40,11 +40,73 @@ class Renderer:
     def is_bidirectional(self, src: str, dst: str) -> bool:
         return tuple(sorted((src, dst))) in self.bidirectional_edges
 
+    def draw_traffic_lights(self, graph, camera_convert_func, zoom: float):
+        """
+        Dessine les indicateurs de feux tricolores.
+        CORRIGÉ : Calcul en espace écran pour coller parfaitement aux nœuds clippés.
+        """
+        # 1. Récupérer les tailles VISUELLES exactes (les mêmes que dans draw_node/draw_edge)
+        # Rayon du noeud tel qu'il est dessiné (borné entre 10 et 35 pixels)
+        node_radius_visual = max(10, min(35, Sizes.NODE_RADIUS_BASE * zoom))
+
+        # Largeur de la route telle qu'elle est dessinée (bornée entre 2 et 20 pixels)
+        road_width_visual = max(2, min(20, Sizes.ROAD_WIDTH_BASE * zoom))
+
+        # Rayon du feu
+        light_radius = max(4, int(Sizes.TRAFFIC_LIGHT_RADIUS * zoom))
+
+        # 2. Définir les décalages en PIXELS
+        # On se place au bord du noeud + une petite marge
+        offset_back_px = node_radius_visual + 5
+
+        # On se place au bord de la route + rayon du feu + petite marge
+        offset_side_px = (road_width_visual / 2) + light_radius + 2
+
+        for node_id, intersection in graph.intersections.items():
+            if not hasattr(intersection, "get_state"):
+                continue
+
+            # Position centrale du carrefour EN ECRAN
+            node_data = graph.get_node(node_id)
+            # On convertit tout de suite en pixels
+            cx, cy = camera_convert_func((node_data['x'], node_data['y']))
+
+            incoming_nodes = graph.get_incoming_nodes(node_id)
+            for inc_node in incoming_nodes:
+                state = intersection.get_state(inc_node)
+                color = Colors.TL_GREEN if state == "GREEN" else Colors.TL_RED
+
+                # Position source EN ECRAN
+                inc_data = graph.get_node(inc_node)
+                ix, iy = camera_convert_func((inc_data['x'], inc_data['y']))
+
+                # Vecteur : Du Centre vers la Source (Vers l'arrière de la route)
+                vx, vy = ix - cx, iy - cy
+                dist = math.hypot(vx, vy)
+
+                if dist < 1: continue
+
+                # Normalisation (Direction arrière)
+                ux, uy = vx / dist, vy / dist
+
+                # Perpendiculaire pour aller sur le côté DROIT de la route (dans le sens entrant)
+                # Si on regarde du centre vers la source, la droite de la route est à notre gauche.
+                # Vecteur normal (-y, x) applique une rotation de 90°
+                px, py = -uy, ux
+
+                # Calcul final en pixels directement
+                # Centre + (Recul vers l'arrière) + (Décalage côté)
+                lx = cx + (ux * offset_back_px) + (px * offset_side_px)
+                ly = cy + (uy * offset_back_px) + (py * offset_side_px)
+
+                pygame.draw.circle(self.screen, Colors.TL_OUTLINE, (int(lx), int(ly)), light_radius + 1)
+                pygame.draw.circle(self.screen, color, (int(lx), int(ly)), light_radius)
+
     def draw_edge(self, src_pos: Tuple[float, float], dst_pos: Tuple[float, float],
                   edge, src: str, dst: str, is_hovered: bool, zoom: float):
 
         base_width = Sizes.ROAD_WIDTH_BASE * zoom
-        current_width = int(max(2, min(20, base_width)))
+        current_width = int(max(2, min(20, int(base_width))))
 
         if is_hovered:
             current_width += 2
@@ -52,7 +114,7 @@ class Renderer:
         # Gestion des doubles routes (offset)
         start_draw, end_draw = src_pos, dst_pos
         if self.is_bidirectional(src, dst):
-            offset_dist = max(4, min(15, (Sizes.ROAD_SEPARATION / 2) * zoom))
+            offset_dist = max(4, min(15, int((Sizes.ROAD_SEPARATION / 2) * zoom)))
             start_draw, end_draw = offset_line(src_pos, dst_pos, -offset_dist)
 
         # Dessin de la route avec couleur basée sur la congestion
@@ -68,7 +130,7 @@ class Renderer:
         length = math.hypot(dx, dy)
 
         if length > 40:
-            arrow_size = max(5, min(12, Sizes.ARROW_SIZE * zoom))
+            arrow_size = max(5, min(12, int(Sizes.ARROW_SIZE * zoom)))
             arrow_points = get_arrow_points(start_draw, end_draw, arrow_size)
             arrow_color = Colors.TEXT_DIM
             pygame.draw.polygon(self.screen, arrow_color, arrow_points)
