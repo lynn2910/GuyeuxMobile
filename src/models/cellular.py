@@ -1,5 +1,5 @@
 from queue import Queue
-
+import random
 import pygame
 
 from models.base import BaseEdge
@@ -23,13 +23,15 @@ class CellularEdge(BaseEdge):
     def insert_vehicle(self, vehicle):
         """
         Insert a vehicle at the beginning of the edge (position 0) or to the queue.
+        Returns True if successfully inserted, False if queued.
         """
         if self.cells[0] is None:
             self.cells[0] = vehicle
             vehicle.speed = min(vehicle.speed, self.vmax)
+            return True
         else:
             self.entry_queue.put(vehicle)
-            print(f"Warning: Vehicle {vehicle.id} trying to enter blocked edge, putting it in the queue")
+            return False  # Vehicle was queued, not immediately inserted
 
     def update(self) -> list:
         exiting = []
@@ -39,7 +41,6 @@ class CellularEdge(BaseEdge):
         # From right to left
         # That way, we're sure that the cars at the outer edge will move BEFORE the car behind (no collision :D)
         for pos in range(self.distance - 1, -1, -1):
-            # TODO applying prob_slow
             vehicle = self.cells[pos]
             if vehicle is None:
                 continue
@@ -48,6 +49,11 @@ class CellularEdge(BaseEdge):
             # or to go faster, until it reaches the vmax
             distance_to_next = last_vehicle_pos - pos - 1
             vehicle.speed = min(distance_to_next, vehicle.speed + 1, self.vmax)
+
+            # *** CORRECTION: Application de prob_slow ***
+            # Avec une probabilité prob_slow, le véhicule ralentit aléatoirement
+            if random.random() < self.prob_slow and vehicle.speed > 0:
+                vehicle.speed = max(0, vehicle.speed - 1)
 
             # Update the car pos, and make the car exit the edge if required to
             next_pos = pos + vehicle.speed
@@ -90,10 +96,6 @@ class CellularEdge(BaseEdge):
 
                 pygame.draw.circle(screen, vehicle_color, (int(x), int(y)), 5)
 
-                # font = pygame.font.Font(None, 14)
-                # speed_text = font.render(str(cell.speed), True, (0, 0, 0))
-                # screen.blit(speed_text, (int(x) + 7, int(y) - 5))
-
     def get_infos(self) -> list:
         """
         Return information about an edge
@@ -103,6 +105,7 @@ class CellularEdge(BaseEdge):
         queue_size = self.entry_queue.qsize()
 
         infos = [
+            f"Type:       Cellular",
             f"Vmax:       {self.vmax * 10} Km/h",
             f"Prob slow:  {int(self.prob_slow * 100)}%",
             f"Vehicles:   {num_vehicles}/{self.distance}",
@@ -118,7 +121,26 @@ class CellularEdge(BaseEdge):
 
     @staticmethod
     def evaluate_weight(src, dst, data):
-        return data['object'].distance
+        """
+        Évalue le poids d'une edge pour le pathfinding.
+        Pour cellular, on pénalise les routes très occupées.
+        """
+        edge = data['object']
+        base_cost = edge.distance
+
+        # Pénalité basée sur l'occupation
+        num_vehicles = sum(1 for cell in edge.cells if cell is not None)
+        occupation = num_vehicles / edge.distance
+
+        # Si occupation > 80%, on augmente fortement le coût
+        if occupation > 0.8:
+            return base_cost * 3.0
+        elif occupation > 0.5:
+            return base_cost * 1.5
+
+        return base_cost
 
     def get_occupation_ratio(self) -> float:
-        return sum(1 for c in self.cells if c) / self.distance
+        """Retourne le ratio d'occupation normalisé [0,1]"""
+        num_vehicles = sum(1 for c in self.cells if c is not None)
+        return num_vehicles / self.distance if self.distance > 0 else 0.0

@@ -1,17 +1,27 @@
 import random
 import uuid
-
 from core.graph import RoadGraph
 from entities.vehicle import Vehicle
-from models.cellular import CellularEdge
-from cli import debug_log
+
+
+def dynamic_weight(u, v, data):
+    """
+    Fonction adaptatrice qui délègue le calcul du poids
+    à la classe spécifique de l'arête (FluidEdge ou CellularEdge).
+    """
+    edge = data.get('object')
+    if edge:
+        # type(edge) renvoie la classe (FluidEdge ou CellularEdge)
+        # On appelle ensuite sa méthode statique evaluate_weight
+        return type(edge).evaluate_weight(u, v, data)
+    return 1  # Fallback si pas d'objet
 
 
 class VehicleSpawner:
     def __init__(self, spawn_ratio: float, node: str):
         """
         Initiate a spawner
-        :param spawn_ratio: The ratio at which cars spawn ; 1 is VERY BIG (100% chance per tick), and 0 is no-spawning
+        :param spawn_ratio: The ratio at which cars spawn
         :param node: The node identifier at which the spawner is located
         """
         self.spawn_ratio = spawn_ratio
@@ -24,39 +34,39 @@ class VehicleSpawner:
         if random.random() > self.spawn_ratio:
             return None
 
-        debug_log("Spawning a vehicle...")
+        # print("Spawning a vehicle...")
 
         all_nodes = list(graph.graph.nodes)
-
         possible_destinations = [n for n in all_nodes if n != self.node]
 
-        debug_log(possible_destinations)
-
         if not possible_destinations:
-            debug_log("no possible_destinations")
             return None
 
         destination = random.choice(possible_destinations)
-        debug_log(destination)
 
-        path = graph.get_path(self.node, destination, CellularEdge.evaluate_weight)
-        debug_log(path)
+        # --- CORRECTION ICI ---
+        # On utilise dynamic_weight au lieu de CellularEdge.evaluate_weight
+        try:
+            path = graph.get_path(self.node, destination, dynamic_weight)
+        except RuntimeError:
+            # Si aucun chemin n'est trouvé
+            return None
 
         if not path or len(path) < 2:
-            debug_log("no path")
             return None
 
         veh_id = f"auto_{str(uuid.uuid4())[:5]}"
-        debug_log(veh_id)
 
+        # Création du véhicule (chemin complet sans le noeud de départ)
         vehicle = Vehicle(vehicle_id=veh_id, path=path[1:])
 
         next_node = path[1]
         start_edge = graph.get_edge(self.node, next_node)
 
         if start_edge:
-            start_edge.insert_vehicle(vehicle)
-            debug_log(f"Spawn: {veh_id} from {self.node} to {destination}")
-            return vehicle
+            # L'insertion renvoie True si réussie, False si route pleine
+            if start_edge.insert_vehicle(vehicle):
+                # print(f"Spawn: {veh_id} from {self.node} to {destination}")
+                return vehicle
 
         return None

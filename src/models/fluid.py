@@ -20,17 +20,16 @@ class FluidEdge(BaseEdge):
         self.max_vehicles = int(self.distance * self.density_max)
 
         # Stockage : Liste des véhicules présents et dictionnaire de leurs positions
-        # On utilise une liste pour l'ordre (FIFO)
         self.vehicles = []
         self.positions = {}  # {vehicle_id: float_position}
 
     def insert_vehicle(self, vehicle: Vehicle):
         """
         Tente d'insérer un véhicule au début de l'arête.
-        Retourne False si l'arête est saturée (Jam density atteinte).
+        Retourne True si succès, False si l'arête est saturée.
         """
         if len(self.vehicles) >= self.max_vehicles:
-            # Route saturée, bouchon à l'entrée
+            # Route saturée, on refuse l'insertion
             return False
 
         self.vehicles.append(vehicle)
@@ -40,8 +39,7 @@ class FluidEdge(BaseEdge):
 
     def update(self) -> list:
         """
-        Mise à jour selon le modèle de Greenshields.
-        v = vmax * (1 - k/k_jam)
+        Mise à jour selon le modèle de Greenshields avec vitesse minimale garantie.
         """
         exiting = []
 
@@ -52,24 +50,38 @@ class FluidEdge(BaseEdge):
 
         density = count / self.distance
 
-        # 2. Calcul de la vitesse globale du flux pour ce tick
-        # On s'assure que la vitesse ne soit jamais négative
-        current_speed = self.vmax * (1.0 - (density / self.density_max))
-        current_speed = max(0.0, current_speed)
+        # --- CORRECTION ICI ---
+        # On calcule le facteur de ralentissement (1.0 = fluide, 0.0 = bouché)
+        speed_factor = 1.0 - (density / self.density_max)
 
-        # Facteur aléatoire mineur pour éviter la synchronisation parfaite (optionnel)
-        # current_speed *= random.uniform(0.9, 1.1)
+        # On empêche le facteur de tomber à 0 absolu.
+        # On garde toujours au moins 5% ou 10% de la vitesse (vitesse de "crawl")
+        # Sinon le bouchon ne se résorbe jamais.
+        speed_factor = max(0.1, speed_factor)
+
+        # 2. Calcul de la vitesse globale
+        current_speed = self.vmax * speed_factor
 
         # 3. Mise à jour des positions
-        # On parcourt une copie pour pouvoir modifier la liste originale
+        # On itère sur une copie pour pouvoir modifier la liste originale sans bug
         for vehicle in list(self.vehicles):
             current_pos = self.positions[vehicle.id]
 
-            # Mise à jour de la vitesse du véhicule (pour info/visuel)
-            vehicle.speed = current_speed * random.uniform(0.95, 1.05)
+            # Variance : plus naturelle.
+            # On évite que des voitures doublent trop violemment dans un bouchon.
+            if speed_factor < 0.3:
+                # Dans les bouchons, variance faible (tout le monde se suit)
+                variance = random.uniform(0.9, 1.1)
+            else:
+                # Fluide, variance plus libre
+                variance = random.uniform(0.85, 1.15)
+
+            # Vitesse finale du véhicule pour ce tick
+            veh_speed = current_speed * variance
+            vehicle.speed = veh_speed  # Mise à jour pour le visualiseur
 
             # Nouvelle position
-            new_pos = current_pos + current_speed
+            new_pos = current_pos + veh_speed
 
             if new_pos >= self.distance:
                 # Le véhicule sort
@@ -89,8 +101,8 @@ class FluidEdge(BaseEdge):
 
     def get_infos(self) -> list:
         count = len(self.vehicles)
-        density = count / self.distance
-        speed = self.vmax * (1.0 - (density / self.density_max))
+        density = count / self.distance if self.distance > 0 else 0
+        speed = self.vmax * (1.0 - (density / self.density_max)) if self.density_max > 0 else 0
 
         infos = [
             f"Type:       Fluide (LWR)",
@@ -98,26 +110,34 @@ class FluidEdge(BaseEdge):
             f"Densité:    {density:.3f} v/m",
             f"V. Flux:    {speed:.1f} m/t",
             f"Véhicules:  {count}/{self.max_vehicles}",
-            f"Occupation: {(count / self.max_vehicles) * 100:.1f}%"
+            f"Occupation: {(count / max(self.max_vehicles, 1)) * 100:.1f}%"
         ]
         return infos
 
     @staticmethod
     def evaluate_weight(src, dst, data):
-        # Pour le pathfinding, le poids peut être dynamique selon la congestion !
+        """
+        Pour le pathfinding, le poids est dynamique selon la congestion.
+        """
         edge = data['object']
         base_cost = edge.distance
 
         # Pénalité de congestion : Coût = Distance / Vitesse_Actuelle
-        # Si vide : Coût = Distance / Vmax
-        # Si plein : Coût augmente
         count = len(edge.vehicles)
+
+        if count == 0:
+            return base_cost / edge.vmax  # Temps minimal
+
         density = count / edge.distance
+        speed_factor = 1.0 - (density / edge.density_max)
 
-        factor = 1.0 - (density / edge.density_max)
-        if factor <= 0.01: factor = 0.01  # Éviter division par zéro
+        # Éviter division par zéro
+        if speed_factor <= 0.01:
+            speed_factor = 0.01
 
-        return base_cost / factor  # Plus c'est lent, plus le "poids" est grand
+        # Coût = distance / vitesse effective
+        return base_cost / (edge.vmax * speed_factor)
 
     def get_occupation_ratio(self) -> float:
-        return len(self.vehicles) / self.max_vehicles
+        """Retourne le ratio d'occupation normalisé [0,1]"""
+        return len(self.vehicles) / max(self.max_vehicles, 1)
