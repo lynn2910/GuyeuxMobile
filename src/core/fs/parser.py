@@ -4,8 +4,8 @@ from core.fs.tokenizer import Token, TokenType, Tokenizer
 from core.graph import RoadGraph
 from entities.vehicle import Vehicle
 from entities.vehicle_spawner import VehicleSpawner
-from models.cellular import CellularEdge
-from models.fluid import FluidEdge
+from models.edges.cellular import CellularEdge
+from models.edges.fluid import FluidEdge
 
 
 class Parser:

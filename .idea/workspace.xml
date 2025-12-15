@@ -4,11 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="34ca026d-ff22-4622-8518-3eb132e69b03" name="Changes" comment="chore: update todo list">
+    <list default="true" id="34ca026d-ff22-4622-8518-3eb132e69b03" name="Changes" comment="feat: enhance vehicle rendering with trail effect and improve spawner ratios">
+      <change afterPath="$PROJECT_DIR$/src/models/intersections/base_intersection.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/models/intersections/traffic_light_intersection.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/map/belfort.smap" beforeDir="false" afterPath="$PROJECT_DIR$/data/map/belfort.smap" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/simulation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/simulation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ui/renderer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ui/renderer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/fs/parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/fs/parser.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/graph.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/graph.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/edges/base_edge.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/cellular.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/edges/cellular.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/fluid.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/edges/fluid.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -81,6 +86,7 @@
       <recent name="R:\IUT_Code\S5\Modelisation_math\data\map" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="R:\IUT_Code\S5\Modelisation_math\src\models\edges" />
       <recent name="R:\IUT_Code\S5\Modelisation_math\src\entities" />
     </key>
   </component>
@@ -191,7 +197,7 @@
       <workItem from="1765380302227" duration="796000" />
       <workItem from="1765492797417" duration="337000" />
       <workItem from="1765818754594" duration="130000" />
-      <workItem from="1765818911709" duration="4206000" />
+      <workItem from="1765818911709" duration="5613000" />
     </task>
     <task id="LOCAL-00001" summary="feat: Add parser with a syntax for map declaration">
       <option name="closed" value="true" />
@@ -289,7 +295,15 @@
       <option name="project" value="LOCAL" />
       <updated>1765830907332</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="feat: enhance vehicle rendering with trail effect and improve spawner ratios">
+      <option name="closed" value="true" />
+      <created>1765831707120</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1765831707120</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -308,7 +322,8 @@
     <MESSAGE value="feat: better visualization for the fluid sim" />
     <MESSAGE value="feat: fix some quirks with the fluid simulation" />
     <MESSAGE value="chore: update todo list" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore: update todo list" />
+    <MESSAGE value="feat: enhance vehicle rendering with trail effect and improve spawner ratios" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: enhance vehicle rendering with trail effect and improve spawner ratios" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

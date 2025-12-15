@@ -2,7 +2,7 @@ from queue import Queue
 import random
 import pygame
 
-from models.base import BaseEdge
+from models.edges.base_edge import BaseEdge
 
 
 class CellularEdge(BaseEdge):

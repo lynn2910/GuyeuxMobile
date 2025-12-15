@@ -1,5 +1,5 @@
 # models/fluid.py
-from models.base import BaseEdge
+from models.edges.base_edge import BaseEdge
 from entities.vehicle import Vehicle
 import random
 

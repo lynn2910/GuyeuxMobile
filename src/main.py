@@ -2,14 +2,11 @@
 import os
 from os import path
 
-import networkx as nx
-import matplotlib.pyplot as plt
-
 from cli import parse_arguments, debug_log
 from core.fs.parser import import_map
 from core.graph import RoadGraph
 from core.simulation import Simulation
-from models.cellular import CellularEdge
+from models.edges.cellular import CellularEdge
 from ui.visualizer import Visualizer
 
 

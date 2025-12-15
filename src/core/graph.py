@@ -1,12 +1,17 @@
 import math
+from typing import Optional, List
+
 import networkx as nx
-from models.base import BaseEdge
+from models.edges.base_edge import BaseEdge
 import matplotlib.pyplot as plt
+
+from models.intersections.base_intersection import BaseIntersection
 
 
 class RoadGraph:
     def __init__(self):
         self.graph = nx.DiGraph()
+        self.intersections = {}
 
     def add_node(self, node_id: str, x: float, y: float):
         self.graph.add_node(node_id, x=x, y=y)
@@ -74,3 +79,20 @@ class RoadGraph:
         plt.title("Visualisation de la carte (Coordonnées réelles)")
         plt.axis('equal')
         plt.savefig(f"data/results/{file_name}.png")
+
+    def add_intersection(self, intersection: BaseIntersection):
+        """Attache une logique d'intersection à un nœud existant"""
+        if self.graph.has_node(intersection.node_id):
+            self.intersections[intersection.node_id] = intersection
+
+    def get_intersection(self, node_id: str) -> Optional[BaseIntersection]:
+        return self.intersections.get(node_id)
+
+    def get_incoming_nodes(self, node_id: str) -> List[str]:
+        """Utilitaire pour savoir qui arrive vers ce noeud (predecessors)"""
+        return list(self.graph.predecessors(node_id))
+
+    def update_intersections(self):
+        """Appelé par la simulation à chaque tick"""
+        for intersect in self.intersections.values():
+            intersect.update()
