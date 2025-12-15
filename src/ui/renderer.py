@@ -1,22 +1,18 @@
 """
-Rendering system for roads, nodes, and vehicles.
+Rendering system for roads, nodes, and vehicles with improved fluid visualization.
 """
 
 import pygame
 import math
 from typing import Tuple, Optional
 from ui.styles import Colors, Sizes, Fonts
-from ui.geometry import (
-    offset_line, get_arrow_points, lerp_color
-)
+from ui.geometry import offset_line, get_arrow_points, lerp_color
 
 
 class Renderer:
     def __init__(self, screen: pygame.Surface):
         self.screen = screen
 
-        # Use system fonts to avoid unicode/rectangle issues
-        # 'Arial' is generally safe. None defaults to internal pygame font which handles numbers well but not symbols.
         self.font_large = pygame.font.SysFont("Arial", Fonts.LARGE, bold=True)
         self.font_medium = pygame.font.SysFont("Arial", Fonts.MEDIUM, bold=True)
         self.font_small = pygame.font.SysFont("Arial", Fonts.SMALL)
@@ -38,7 +34,6 @@ class Renderer:
 
         for src, dst, _ in edges:
             if (dst, src) in existing_connections:
-                # Store tuple sorted so order doesn't matter for the key
                 key = tuple(sorted((src, dst)))
                 self.bidirectional_edges.add(key)
 
@@ -48,10 +43,7 @@ class Renderer:
     def draw_edge(self, src_pos: Tuple[float, float], dst_pos: Tuple[float, float],
                   edge, src: str, dst: str, is_hovered: bool, zoom: float):
 
-        # --- CORRECTION DIMENSIONS ---
-        # On limite (clamp) la largeur maximale de la route pour éviter l'effet "autoroute géante"
         base_width = Sizes.ROAD_WIDTH_BASE * zoom
-        # Largeur : min 2px, max 20px (ajustable)
         current_width = int(max(2, min(20, base_width)))
 
         if is_hovered:
@@ -60,82 +52,133 @@ class Renderer:
         # Gestion des doubles routes (offset)
         start_draw, end_draw = src_pos, dst_pos
         if self.is_bidirectional(src, dst):
-            # L'écartement doit aussi être limité pour ne pas que les routes s'éloignent trop
             offset_dist = max(4, min(15, (Sizes.ROAD_SEPARATION / 2) * zoom))
             start_draw, end_draw = offset_line(src_pos, dst_pos, -offset_dist)
 
-        # Dessin de la route
+        # Dessin de la route avec couleur basée sur la congestion
         color = self._get_traffic_color(edge)
         if is_hovered:
             color = Colors.ROAD_HOVER
 
         pygame.draw.line(self.screen, color, start_draw, end_draw, current_width)
 
-        # Flèches
+        # Flèches de direction
         dx = end_draw[0] - start_draw[0]
         dy = end_draw[1] - start_draw[1]
         length = math.hypot(dx, dy)
 
-        # On ne dessine les flèches que si la route est assez longue visuellement
         if length > 40:
-            # Taille flèche limitée aussi
             arrow_size = max(5, min(12, Sizes.ARROW_SIZE * zoom))
             arrow_points = get_arrow_points(start_draw, end_draw, arrow_size)
             arrow_color = Colors.TEXT_DIM
             pygame.draw.polygon(self.screen, arrow_color, arrow_points)
 
-        self._draw_vehicles(start_draw, end_draw, edge, zoom)
+        # Différencier le rendu selon le type d'edge
+        if hasattr(edge, 'cells'):
+            # Modèle cellular : points discrets
+            self._draw_cellular_vehicles(start_draw, end_draw, edge, zoom)
+        elif hasattr(edge, 'get_vehicle_positions'):
+            # Modèle fluide : visualisation continue
+            self._draw_fluid_traffic(start_draw, end_draw, edge, zoom, current_width)
 
-    def _draw_vehicles(self, start_pos: Tuple[float, float], end_pos: Tuple[float, float], edge, zoom: float):
+    def _draw_cellular_vehicles(self, start_pos: Tuple[float, float],
+                                end_pos: Tuple[float, float], edge, zoom: float):
+        """Dessine les véhicules discrets pour le modèle cellular"""
         vehicle_radius = int(max(3, min(8, int(Sizes.VEHICLE_RADIUS * zoom))))
 
-        vehicle_iterator = []
+        for i, cell in enumerate(edge.cells):
+            if cell is not None:
+                t = (i + 0.5) / edge.distance
+                x = start_pos[0] + t * (end_pos[0] - start_pos[0])
+                y = start_pos[1] + t * (end_pos[1] - start_pos[1])
+                pygame.draw.circle(self.screen, Colors.VEHICLE, (int(x), int(y)), vehicle_radius)
 
-        if hasattr(edge, 'cells'):
-            for i, cell in enumerate(edge.cells):
-                if cell is not None:
-                    t = (i + 0.5) / edge.distance
-                    vehicle_iterator.append(t)
+    def _draw_fluid_traffic(self, start_pos: Tuple[float, float],
+                            end_pos: Tuple[float, float], edge, zoom: float, road_width: int):
+        """
+        Dessine le trafic fluide avec des segments colorés représentant la densité locale.
+        Plus réaliste pour le modèle LWR.
+        """
+        if len(edge.vehicles) == 0:
+            return
 
-        elif hasattr(edge, 'get_vehicle_positions'):
-            for _, ratio in edge.get_vehicle_positions():
-                vehicle_iterator.append(ratio)
+        # Option 1: Dessiner des véhicules semi-transparents avec trainée
+        vehicle_radius = int(max(2, min(6, int(Sizes.VEHICLE_RADIUS * zoom * 0.8))))
 
-        # Dessin commun
-        for t in vehicle_iterator:
-            x = start_pos[0] + t * (end_pos[0] - start_pos[0])
-            y = start_pos[1] + t * (end_pos[1] - start_pos[1])
+        # Calculer la vitesse moyenne pour l'effet de trainée
+        avg_speed = sum(v.speed for v in edge.vehicles) / len(edge.vehicles) if edge.vehicles else 0
+        trail_length = max(0, min(0.15, avg_speed / edge.vmax * 0.15))  # Trainée proportionnelle à la vitesse
+
+        for vehicle, ratio in edge.get_vehicle_positions():
+            # Position actuelle
+            x = start_pos[0] + ratio * (end_pos[0] - start_pos[0])
+            y = start_pos[1] + ratio * (end_pos[1] - start_pos[1])
+
+            # Dessiner une trainée si le véhicule va vite
+            if trail_length > 0.01 and ratio > trail_length:
+                # Position de début de trainée
+                trail_ratio = ratio - trail_length
+                x_trail = start_pos[0] + trail_ratio * (end_pos[0] - start_pos[0])
+                y_trail = start_pos[1] + trail_ratio * (end_pos[1] - start_pos[1])
+
+                # Trainée dégradée
+                trail_color = (*Colors.VEHICLE[:2], Colors.VEHICLE[2], 80)  # Semi-transparent
+                pygame.draw.line(self.screen, trail_color,
+                                 (int(x_trail), int(y_trail)),
+                                 (int(x), int(y)),
+                                 max(2, vehicle_radius))
+
+            # Véhicule principal
             pygame.draw.circle(self.screen, Colors.VEHICLE, (int(x), int(y)), vehicle_radius)
 
-    @staticmethod
-    def _get_traffic_color(edge) -> Tuple[int, int, int]:
-        occupation = 0.0
+            # Option: ajouter un indicateur de vitesse (petit trait)
+            if zoom > 1.5:  # Seulement si assez zoomé
+                speed_ratio = vehicle.speed / edge.vmax if edge.vmax > 0 else 0
+                indicator_length = 5 * zoom * speed_ratio
 
-        # Calcul occupation selon le modèle
-        if hasattr(edge, 'cells'):
-            num_vehicles = sum(1 for cell in edge.cells if cell is not None)
-            occupation = num_vehicles / max(edge.distance, 1)
+                if indicator_length > 2:
+                    angle = math.atan2(end_pos[1] - start_pos[1], end_pos[0] - start_pos[0])
+                    end_x = x + indicator_length * math.cos(angle)
+                    end_y = y + indicator_length * math.sin(angle)
+                    pygame.draw.line(self.screen, (255, 255, 255),
+                                     (int(x), int(y)), (int(end_x), int(end_y)), 2)
 
-        elif hasattr(edge, 'vehicles') and hasattr(edge, 'max_vehicles'):
-            # Modèle fluide
-            occupation = len(edge.vehicles) / max(edge.max_vehicles, 1)
+    def _get_traffic_color(self, edge) -> Tuple[int, int, int]:
+        """Calcule la couleur basée sur l'occupation normalisée"""
+        try:
+            occupation = edge.get_occupation_ratio()
+        except:
+            # Fallback si get_occupation_ratio n'est pas implémenté
+            if hasattr(edge, 'cells'):
+                occupation = sum(1 for c in edge.cells if c) / max(edge.distance, 1)
+            elif hasattr(edge, 'vehicles') and hasattr(edge, 'max_vehicles'):
+                occupation = len(edge.vehicles) / max(edge.max_vehicles, 1)
+            else:
+                occupation = 0.0
 
-        # Logique de couleur identique
-        if occupation < 0.3:
-            t = occupation / 0.3
+        # Gradation plus nuancée pour le modèle fluide
+        if occupation < 0.2:
+            # Très fluide : vert
+            t = occupation / 0.2
+            return lerp_color(Colors.TRAFFIC_LOW, Colors.TRAFFIC_LOW, t)
+        elif occupation < 0.5:
+            # Fluide modéré : vert -> jaune
+            t = (occupation - 0.2) / 0.3
             return lerp_color(Colors.TRAFFIC_LOW, Colors.TRAFFIC_MEDIUM, t)
         elif occupation < 0.8:
-            t = (occupation - 0.3) / 0.5
-            return lerp_color(Colors.TRAFFIC_MEDIUM, Colors.TRAFFIC_HIGH, t)
+            # Congestionné : jaune -> orange
+            t = (occupation - 0.5) / 0.3
+            orange = (255, 140, 60)
+            return lerp_color(Colors.TRAFFIC_MEDIUM, orange, t)
         else:
-            return Colors.TRAFFIC_HIGH
+            # Très congestionné : orange -> rouge
+            t = (occupation - 0.8) / 0.2
+            orange = (255, 140, 60)
+            return lerp_color(orange, Colors.TRAFFIC_HIGH, t)
 
     def draw_node(self, pos: Tuple[float, float], node_id: str,
                   is_hovered: bool, is_entrance: bool, zoom: float):
 
-        # --- CORRECTION DIMENSIONS ---
-        # C'est ici que ça bloquait : on limite le rayon entre 10 et 35 pixels
-        # Peu importe le zoom, le cercle ne sera jamais plus gros que 35px
         scaled_radius = Sizes.NODE_RADIUS_BASE * zoom
         radius = int(max(10, min(35, scaled_radius)))
 
@@ -155,15 +198,13 @@ class Renderer:
         pygame.draw.circle(self.screen, outline_color, (x, y), radius, outline_width)
 
         # Texte (ID du node)
-        # On affiche le texte seulement si le cercle est assez gros pour le contenir
         if radius > 15:
-            # On adapte la police à la taille du cercle, sans dépasser MEDIUM
             if radius > 25:
                 font = self.font_medium
             else:
                 font = self.font_tiny
 
-            text_surf = font.render(str(node_id), True, Colors.TEXT)  # True pour Anti-aliasing
+            text_surf = font.render(str(node_id), True, Colors.TEXT)
             text_rect = text_surf.get_rect(center=(x, y))
             self.screen.blit(text_surf, text_rect)
 
@@ -220,7 +261,7 @@ class Renderer:
         help_text = [
             "L-Click + Drag: Pan",
             "Wheel: Zoom",
-            "R: Reset"
+            "R: Reset View"
         ]
 
         y = 50
@@ -228,3 +269,49 @@ class Renderer:
             surf = self.font_tiny.render(line, True, Colors.TEXT_DIM)
             self.screen.blit(surf, (20, y))
             y += 15
+
+    def draw_legend(self, screen_width: int, screen_height: int):
+        """Dessine une légende des couleurs de trafic"""
+        legend_x = screen_width - 150
+        legend_y = 20
+        legend_width = 130
+        legend_height = 110
+
+        # Background
+        s = pygame.Surface((legend_width, legend_height), pygame.SRCALPHA)
+        s.fill(Colors.INFO_BG)
+        pygame.draw.rect(s, Colors.INFO_BORDER, s.get_rect(), 1)
+        self.screen.blit(s, (legend_x, legend_y))
+
+        # Title
+        title_surf = self.font_small.render("Traffic", True, Colors.TEXT)
+        self.screen.blit(title_surf, (legend_x + 10, legend_y + 10))
+
+        # Color gradient
+        gradient_width = 20
+        gradient_height = 60
+        gradient_x = legend_x + 10
+        gradient_y = legend_y + 35
+
+        # Dessiner le gradient
+        for i in range(gradient_height):
+            ratio = i / gradient_height
+            if ratio < 0.25:
+                color = Colors.TRAFFIC_LOW
+            elif ratio < 0.625:
+                t = (ratio - 0.25) / 0.375
+                color = lerp_color(Colors.TRAFFIC_LOW, Colors.TRAFFIC_MEDIUM, t)
+            else:
+                t = (ratio - 0.625) / 0.375
+                color = lerp_color(Colors.TRAFFIC_MEDIUM, Colors.TRAFFIC_HIGH, t)
+
+            pygame.draw.line(self.screen, color,
+                             (gradient_x, gradient_y + i),
+                             (gradient_x + gradient_width, gradient_y + i))
+
+        # Labels
+        low_surf = self.font_tiny.render("Low", True, Colors.TEXT_DIM)
+        high_surf = self.font_tiny.render("High", True, Colors.TEXT_DIM)
+
+        self.screen.blit(low_surf, (gradient_x + gradient_width + 5, gradient_y))
+        self.screen.blit(high_surf, (gradient_x + gradient_width + 5, gradient_y + gradient_height - 10))

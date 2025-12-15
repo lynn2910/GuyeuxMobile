@@ -1,8 +1,7 @@
 """
-Modern traffic simulation visualizer with camera controls and improved rendering.
+Modern traffic simulation visualizer with improved fluid model visualization.
 """
 import ctypes
-
 import pygame
 from typing import Optional, Tuple
 from ui.camera import Camera
@@ -29,7 +28,7 @@ class Visualizer:
 
         # Create resizable window
         self.screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
-        pygame.display.set_caption("Traffic Simulation - Light Theme")
+        pygame.display.set_caption("Traffic Simulation")
 
         self.graph = graph
         self.running = True
@@ -42,6 +41,7 @@ class Visualizer:
         # UI state
         self.hovered_node = None
         self.hovered_edge = None
+        self.show_legend = True  # Nouveau: afficher la légende
 
         # Pre-calculations
         self._compute_world_positions()
@@ -81,21 +81,12 @@ class Visualizer:
         return pygame.mouse.get_pos()
 
     def _check_node_hover(self, mouse_pos: Tuple[int, int]) -> Optional[str]:
-        # --- CORRECTION HITBOX ---
-        # On applique exactement la même logique que le Renderer :
-        # La taille de détection ne doit pas dépasser la taille visuelle max (35px)
-
         zoom = self.camera.zoom
-        # Rayon théorique
         base_radius = Sizes.NODE_RADIUS_HOVER * zoom
-
-        # Rayon réel affiché (Clamped entre 10 et 35 pixels + marge de confort)
-        detection_radius = max(10, min(35, base_radius)) + 5  # +5px de tolérance
+        detection_radius = max(10, min(35, base_radius)) + 5
 
         for node_id, world_pos in self.world_positions.items():
             screen_pos = self.camera.world_to_screen(world_pos)
-
-            # Calcul de distance en pixels écran
             dx = mouse_pos[0] - screen_pos[0]
             dy = mouse_pos[1] - screen_pos[1]
             dist = (dx * dx + dy * dy) ** 0.5
@@ -107,31 +98,22 @@ class Visualizer:
 
     def _check_edge_hover(self, mouse_pos: Tuple[int, int]) -> Optional[Tuple[str, str, dict]]:
         zoom = self.camera.zoom
-        # Seuil de détection ajusté (env. la demi-largeur de la route)
         threshold = max(6, min(20, 10 * zoom))
-
-        # On récupère l'offset utilisé par le renderer pour être cohérent
         base_offset = (Sizes.ROAD_SEPARATION / 2) * zoom
 
         for src, dst, data in self.graph.get_edges():
             src_world = self.world_positions[src]
             dst_world = self.world_positions[dst]
 
-            # 1. Coordonnées écran de base (centre des nœuds)
             src_screen = self.camera.world_to_screen(src_world)
             dst_screen = self.camera.world_to_screen(dst_world)
 
-            # 2. Calcul du décalage (Exactement comme dans Renderer.draw_edge)
             start_check, end_check = src_screen, dst_screen
 
-            # On vérifie si c'est une route bidirectionnelle via le renderer
-            # (car c'est lui qui détient la logique de détection des paires)
             if self.renderer.is_bidirectional(src, dst):
-                # On applique le même décalage négatif que le renderer
                 from ui.geometry import offset_line
                 start_check, end_check = offset_line(src_screen, dst_screen, -base_offset)
 
-            # 3. Vérification avec la ligne décalée
             if is_point_near_segment(mouse_pos, start_check, end_check, threshold):
                 return (src, dst, data)
 
@@ -154,7 +136,6 @@ class Visualizer:
     def _render(self):
         self.renderer.clear()
 
-        # Pass the zoom level to the renderer so it can scale elements
         zoom_level = self.camera.zoom
 
         # 1. Draw Edges
@@ -184,6 +165,11 @@ class Visualizer:
         self.renderer.draw_tick_counter(self.current_tick)
         self.renderer.draw_controls_help()
 
+        # Nouveau: afficher la légende
+        if self.show_legend:
+            self.renderer.draw_legend(self.width, self.height)
+
+        # Info boxes
         if self.hovered_node:
             self._draw_node_info(self._get_mouse_pos(), self.hovered_node)
         elif self.hovered_edge:
@@ -194,14 +180,35 @@ class Visualizer:
     def _draw_node_info(self, mouse_pos: Tuple[int, int], node_id: str):
         node_data = self.graph.get_node(node_id)
         lines = [f"Pos: ({node_data['x']:.0f}, {node_data['y']:.0f})"]
+
+        # Compter les véhicules entrants/sortants
+        incoming = 0
+        outgoing = 0
+
+        for src, dst, data in self.graph.get_edges():
+            if dst == node_id:
+                edge = data['object']
+                if hasattr(edge, 'vehicles'):
+                    incoming += len(edge.vehicles)
+                elif hasattr(edge, 'cells'):
+                    incoming += sum(1 for c in edge.cells if c)
+            elif src == node_id:
+                edge = data['object']
+                if hasattr(edge, 'vehicles'):
+                    outgoing += len(edge.vehicles)
+                elif hasattr(edge, 'cells'):
+                    outgoing += sum(1 for c in edge.cells if c)
+
+        if incoming > 0 or outgoing > 0:
+            lines.append(f"In: {incoming} | Out: {outgoing}")
+
         self.renderer.draw_info_box((mouse_pos[0] + 15, mouse_pos[1] + 15), lines, title=f"Node {node_id}")
 
     def _draw_edge_info(self, mouse_pos: Tuple[int, int], edge_data):
         src, dst, data = edge_data
         edge = data['object']
 
-        # Clean simple title
-        title = f"{src} -> {dst}"
+        title = f"{src} → {dst}"
 
         lines = [f"Length: {edge.distance}m"]
         if hasattr(edge, 'get_infos'):
@@ -216,14 +223,11 @@ class Visualizer:
                 return False
 
             elif event.type == pygame.VIDEORESIZE:
-                # Handle window resizing
                 self.width = event.w
                 self.height = event.h
                 self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE)
                 self.camera.width = self.width
                 self.camera.height = self.height
-                # Optional: Refit content on resize
-                # self._fit_camera_to_content()
 
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -231,9 +235,11 @@ class Visualizer:
                     return False
                 elif event.key == pygame.K_r:
                     self._fit_camera_to_content()
+                elif event.key == pygame.K_l:
+                    # Nouveau: toggle légende avec la touche L
+                    self.show_legend = not self.show_legend
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                # Left click (1) or Middle click (2) for panning
                 if event.button == 1 or event.button == 2:
                     self.camera.start_pan(event.pos)
                 elif event.button == 4:  # Zoom In
