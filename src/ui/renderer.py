@@ -83,15 +83,50 @@ class Renderer:
 
     def _draw_cellular_vehicles(self, start_pos: Tuple[float, float],
                                 end_pos: Tuple[float, float], edge, zoom: float):
-        """Dessine les véhicules discrets pour le modèle cellular"""
+        """Dessine les véhicules discrets pour le modèle cellular avec effet de trainée"""
         vehicle_radius = int(max(3, min(8, int(Sizes.VEHICLE_RADIUS * zoom))))
 
-        for i, cell in enumerate(edge.cells):
-            if cell is not None:
-                t = (i + 0.5) / edge.distance
-                x = start_pos[0] + t * (end_pos[0] - start_pos[0])
-                y = start_pos[1] + t * (end_pos[1] - start_pos[1])
-                pygame.draw.circle(self.screen, Colors.VEHICLE, (int(x), int(y)), vehicle_radius)
+        # Pour les calculs de position
+        dx_total = end_pos[0] - start_pos[0]
+        dy_total = end_pos[1] - start_pos[1]
+
+        for i, vehicle in enumerate(edge.cells):
+            if vehicle is not None:
+                # Position actuelle (centre de la cellule)
+                t_current = (i + 0.5) / edge.distance
+                x = start_pos[0] + t_current * dx_total
+                y = start_pos[1] + t_current * dy_total
+
+                # --- AJOUT : Effet de trainée (Trail) ---
+                # Dans le modèle cellulaire, la vitesse = nombre de cases parcourues.
+                # On dessine une trainée vers l'arrière proportionnelle à la vitesse.
+                if vehicle.speed > 0:
+                    # On estime la position précédente (d'où vient la voiture)
+                    # On limite à 0 pour ne pas sortir de la route
+                    prev_i = max(0, i - vehicle.speed)
+                    t_prev = (prev_i + 0.5) / edge.distance
+
+                    x_prev = start_pos[0] + t_prev * dx_total
+                    y_prev = start_pos[1] + t_prev * dy_total
+
+                    # Couleur de trainée semi-transparente
+                    # Note: Pygame gère mal l'alpha sur draw.line direct,
+                    # mais avec une couleur un peu plus sombre ça fait l'illusion.
+                    trail_color = (100, 150, 220)
+                    trail_width = max(2, vehicle_radius)  # Un peu plus fin que la voiture
+
+                    pygame.draw.line(self.screen, trail_color,
+                                     (int(x_prev), int(y_prev)),
+                                     (int(x), int(y)),
+                                     trail_width)
+
+                # Dessin du véhicule (par dessus la trainée)
+                # On change la couleur si le véhicule est à l'arrêt (speed=0) -> Rouge foncé
+                color = Colors.VEHICLE
+                if vehicle.speed == 0:
+                    color = (200, 50, 50)  # Rouge si bloqué
+
+                pygame.draw.circle(self.screen, color, (int(x), int(y)), vehicle_radius)
 
     def _draw_fluid_traffic(self, start_pos: Tuple[float, float],
                             end_pos: Tuple[float, float], edge, zoom: float, road_width: int):

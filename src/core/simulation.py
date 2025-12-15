@@ -1,3 +1,4 @@
+# src/core/simulation.py
 from time import sleep, time
 import config
 from cli import debug_log
@@ -30,6 +31,13 @@ class Simulation:
     def add_spawner(self, spawner):
         """Register a new spawner in the simulation"""
         self.spawners.append(spawner)
+
+    def remove_vehicle_safely(self, vehicle):
+        """Helper to safely remove a vehicle without crashing if it's already gone."""
+        try:
+            self.vehicles.remove(vehicle)
+        except ValueError:
+            pass  # Vehicle was already removed, likely due to a multi-hop update
 
     def tick(self):
         """
@@ -68,6 +76,7 @@ class Simulation:
                     print(f"Spawned vehicle {new_vehicle.id} at {spawner.node}")
 
         # 2. Edges & Vehicles move
+        # On récupère toutes les edges. Note : l'ordre d'itération peut influencer les "doubles sauts"
         for src, dist, data in self.graph.get_edges():
             edge = data['object']
             exiting_vehicles = edge.update()
@@ -82,13 +91,22 @@ class Simulation:
                 next_node = vehicle.next_target()
 
                 if next_node is None:
-                    self.vehicles.remove(vehicle)
+                    # Le véhicule est arrivé à destination
+                    self.remove_vehicle_safely(vehicle)
                 else:
                     current_node = dist
                     try:
                         next_edge = self.graph.get_edge(current_node, next_node)
                         vehicle.current_edge = next_edge
-                        next_edge.insert_vehicle(vehicle)
+
+                        # Tentative d'insertion sur la route suivante
+                        inserted = next_edge.insert_vehicle(vehicle)
+
+                        # Note: Si inserted est False (route pleine), le véhicule est dans 
+                        # la file d'attente (Cellular) ou rejeté (Fluid).
+                        # Pour l'instant on le garde dans self.vehicles.
+
                     except RuntimeError:
-                        print(f"Vehicle {vehicle.id} vanished: no edge {current_node}->{next_node}")
-                        self.vehicles.remove(vehicle)
+                        if config.DEBUG:
+                            print(f"Vehicle {vehicle.id} vanished: no edge {current_node}->{next_node}")
+                        self.remove_vehicle_safely(vehicle)
