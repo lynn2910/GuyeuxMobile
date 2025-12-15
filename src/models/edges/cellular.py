@@ -33,41 +33,63 @@ class CellularEdge(BaseEdge):
             self.entry_queue.put(vehicle)
             return False  # Vehicle was queued, not immediately inserted
 
-    def update(self) -> list:
+    def update(self, allow_exit: bool = True) -> list:
+        """
+        :param allow_exit: Si False (Feu Rouge), les véhicules ne peuvent pas sortir.
+        """
         exiting = []
+        last_vehicle_pos = self.distance + 1  # Position virtuelle bloquante
 
-        last_vehicle_pos = self.distance + 1
+        # Si le feu est rouge, la 'barrière' est à la position distance
+        if not allow_exit:
+            last_vehicle_pos = self.distance
 
-        # From right to left
-        # That way, we're sure that the cars at the outer edge will move BEFORE the car behind (no collision :D)
+        # Parcours de la fin vers le début (Right to Left)
         for pos in range(self.distance - 1, -1, -1):
             vehicle = self.cells[pos]
             if vehicle is None:
                 continue
 
-            # Update the car speed to be either right behind the next car,
-            # or to go faster, until it reaches the vmax
+            # Calcul de la distance libre devant
             distance_to_next = last_vehicle_pos - pos - 1
+
+            # Accélération / Freinage
             vehicle.speed = min(distance_to_next, vehicle.speed + 1, self.vmax)
 
-            # *** CORRECTION: Application de prob_slow ***
-            # Avec une probabilité prob_slow, le véhicule ralentit aléatoirement
+            # Probabilité de ralentissement (random brake)
             if random.random() < self.prob_slow and vehicle.speed > 0:
                 vehicle.speed = max(0, vehicle.speed - 1)
 
-            # Update the car pos, and make the car exit the edge if required to
+            # Calcul nouvelle position
             next_pos = pos + vehicle.speed
+
+            # --- LOGIQUE DE SORTIE ---
             if next_pos >= self.distance:
-                exiting.append(vehicle)
-                self.cells[pos] = None
+                if allow_exit:
+                    # FEU VERT : On sort
+                    exiting.append(vehicle)
+                    self.cells[pos] = None
+                    # On ne met pas à jour last_vehicle_pos car le véhicule est parti
+                else:
+                    # FEU ROUGE : On ne devrait pas arriver ici car last_vehicle_pos bloque
+                    # Mais par sécurité, on force l'arrêt à la dernière case
+                    target = self.distance - 1
+                    if target != pos:  # Si on n'y est pas déjà
+                        self.cells[target] = vehicle
+                        self.cells[pos] = None
+                    vehicle.speed = 0
+                    last_vehicle_pos = target  # Ce véhicule devient l'obstacle pour le suivant
             else:
+                # DÉPLACEMENT INTERNE
                 if self.cells[next_pos] is None:
                     self.cells[next_pos] = vehicle
                     self.cells[pos] = None
 
-            last_vehicle_pos = next_pos
+                # Mise à jour de la position du dernier véhicule vu
+                # (Sert d'obstacle pour l'itération suivante de la boucle)
+                last_vehicle_pos = next_pos if self.cells[next_pos] else pos
 
-        # Add a vehicle from the queue if any
+        # Entrée des nouveaux véhicules depuis la queue
         if not self.entry_queue.empty() and self.cells[0] is None:
             self.cells[0] = self.entry_queue.get_nowait()
 

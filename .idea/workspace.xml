@@ -4,16 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="34ca026d-ff22-4622-8518-3eb132e69b03" name="Changes" comment="feat: enhance vehicle rendering with trail effect and improve spawner ratios">
-      <change afterPath="$PROJECT_DIR$/src/models/intersections/base_intersection.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/models/intersections/traffic_light_intersection.py" afterDir="false" />
+    <list default="true" id="34ca026d-ff22-4622-8518-3eb132e69b03" name="Changes" comment="feat: add intersection logic with traffic light control and refactor edge models">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/map/belfort.smap" beforeDir="false" afterPath="$PROJECT_DIR$/data/map/belfort.smap" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/fs/parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/fs/parser.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/graph.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/graph.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/edges/base_edge.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/cellular.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/edges/cellular.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/fluid.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/edges/fluid.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/fs/tokenizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/fs/tokenizer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/simulation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/simulation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/edges/cellular.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/edges/cellular.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -77,7 +74,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "editing.templates",
+    "settings.editor.selected.configurable": "actions.on.save",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -197,7 +194,7 @@
       <workItem from="1765380302227" duration="796000" />
       <workItem from="1765492797417" duration="337000" />
       <workItem from="1765818754594" duration="130000" />
-      <workItem from="1765818911709" duration="5613000" />
+      <workItem from="1765818911709" duration="6156000" />
     </task>
     <task id="LOCAL-00001" summary="feat: Add parser with a syntax for map declaration">
       <option name="closed" value="true" />
@@ -303,7 +300,15 @@
       <option name="project" value="LOCAL" />
       <updated>1765831707120</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="feat: add intersection logic with traffic light control and refactor edge models">
+      <option name="closed" value="true" />
+      <created>1765833317570</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1765833317570</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -323,7 +328,8 @@
     <MESSAGE value="feat: fix some quirks with the fluid simulation" />
     <MESSAGE value="chore: update todo list" />
     <MESSAGE value="feat: enhance vehicle rendering with trail effect and improve spawner ratios" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: enhance vehicle rendering with trail effect and improve spawner ratios" />
+    <MESSAGE value="feat: add intersection logic with traffic light control and refactor edge models" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add intersection logic with traffic light control and refactor edge models" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

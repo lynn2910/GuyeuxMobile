@@ -29,6 +29,9 @@ class TokenType(Enum):
     EOF = "EOF"
     NEWLINE = "NEWLINE"
 
+    INTERSECTIONS = "INTERSECTIONS"
+    TRAFFIC_LIGHT = "TRAFFIC_LIGHT"
+
 
 @dataclass
 class Token:
@@ -108,6 +111,8 @@ class Tokenizer:
             "CAR": TokenType.CAR,
             "SPAWNERS": TokenType.SPAWNERS,
             "SPAWNER": TokenType.SPAWNER,
+            "INTERSECTIONS": TokenType.INTERSECTIONS,
+            "TRAFFIC_LIGHT": TokenType.TRAFFIC_LIGHT,
         }
 
         token_type = keywords.get(ident, TokenType.IDENTIFIER)

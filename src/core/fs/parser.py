@@ -6,6 +6,7 @@ from entities.vehicle import Vehicle
 from entities.vehicle_spawner import VehicleSpawner
 from models.edges.cellular import CellularEdge
 from models.edges.fluid import FluidEdge
+from models.intersections.traffic_light_intersection import TrafficLightIntersection
 
 
 class Parser:
@@ -95,10 +96,8 @@ class Parser:
     def parse_simulation(self) -> List[dict]:
         self.skip_newlines()
 
-        if self.current_token().type not in [TokenType.SIMULATION, TokenType.VEHICLES]:
-            return []
-
-        self.current_token()
+        # The type is SIMULATION or VEHICLES, checked by the caller.
+        # We just need to advance past it.
         self.advance()
         self.expect(TokenType.COLON)
         self.skip_newlines()
@@ -113,9 +112,6 @@ class Parser:
 
     def parse_spawners_section(self) -> List[dict]:
         self.skip_newlines()
-        if self.current_token().type != TokenType.SPAWNERS:
-            return []
-
         self.expect(TokenType.SPAWNERS)
         self.expect(TokenType.COLON)
         self.skip_newlines()
@@ -157,6 +153,44 @@ class Parser:
             "end": end_node
         }
 
+    def parse_intersections(self) -> List[dict]:
+        """Lit la section INTERSECTIONS"""
+        self.skip_newlines()
+        self.expect(TokenType.INTERSECTIONS)
+        self.expect(TokenType.COLON)
+        self.skip_newlines()
+
+        intersections = []
+
+        # On regarde le token actuel pour décider du type
+        while self.current_token().type in [TokenType.TRAFFIC_LIGHT]:  # Ajoutez d'autres types ici plus tard
+
+            intersection_type = "UNKNOWN"
+            node_id = ""
+            params = {}
+
+            if self.current_token().type == TokenType.TRAFFIC_LIGHT:
+                intersection_type = "TRAFFIC_LIGHT"
+                self.expect(TokenType.TRAFFIC_LIGHT)
+                node_id = self.expect(TokenType.IDENTIFIER).value
+
+                # Parsing des paramètres spécifiques aux feux
+                while self.current_token().type == TokenType.IDENTIFIER:
+                    key = self.expect(TokenType.IDENTIFIER).value
+                    self.expect(TokenType.EQUALS)
+                    value = self.expect(TokenType.NUMBER).value
+                    params[key] = value
+
+            # Ajouter le dictionnaire avec le TYPE explicite
+            intersections.append({
+                "type": intersection_type,
+                "node": node_id,
+                "params": params
+            })
+            self.skip_newlines()
+
+        return intersections
+
 
 def import_map(file_path: str):
     with open(file_path, "r") as f:
@@ -164,13 +198,46 @@ def import_map(file_path: str):
 
     tokenizer = Tokenizer(content)
     tokens = tokenizer.tokenize()
-
     parser = Parser(tokens)
-    graph_data = parser.parse_graph()
-    simulation_data = parser.parse_simulation()
-    spawners_data = parser.parse_spawners_section()
+
+    graph_data = None
+    simulation_data = []
+    spawners_data = []
+    intersections_data = []
+
+    parser.skip_newlines()
+    while parser.current_token().type != TokenType.EOF:
+        token_type = parser.current_token().type
+
+        if token_type == TokenType.GRAPH:
+            if graph_data is not None:
+                raise SyntaxError(f"Duplicate GRAPH section at line {parser.current_token().line}")
+            graph_data = parser.parse_graph()
+        elif token_type in [TokenType.SIMULATION, TokenType.VEHICLES]:
+            if simulation_data:
+                raise SyntaxError(f"Duplicate VEHICLES/SIMULATION section at line {parser.current_token().line}")
+            simulation_data = parser.parse_simulation()
+        elif token_type == TokenType.SPAWNERS:
+            if spawners_data:
+                raise SyntaxError(f"Duplicate SPAWNERS section at line {parser.current_token().line}")
+            spawners_data = parser.parse_spawners_section()
+        elif token_type == TokenType.INTERSECTIONS:
+            if intersections_data:
+                raise SyntaxError(f"Duplicate INTERSECTIONS section at line {parser.current_token().line}")
+            intersections_data = parser.parse_intersections()
+        else:
+            token = parser.current_token()
+            raise SyntaxError(f"Unexpected token '{token.value}' of type {token.type} at line {token.line}")
+
+        parser.skip_newlines()
+
+    if graph_data is None:
+        raise SyntaxError("Missing GRAPH section")
 
     graph = build_graph(graph_data)
+
+    build_intersections(intersections_data, graph)
+
     vehicles = build_vehicles(simulation_data, graph)
     spawners = build_spawners(spawners_data, graph)
 
@@ -259,3 +326,26 @@ def build_spawners(spawners_data: List[dict], graph: RoadGraph) -> List[VehicleS
 
         spawners.append(VehicleSpawner(ratio, node_id))
     return spawners
+
+
+def build_intersections(data_list: List[dict], graph: RoadGraph):
+    for item in data_list:
+        node_id = item["node"]
+        itype = item["type"]
+        params = item["params"]
+
+        # Récupération des routes entrantes (commun à toutes les intersections)
+        incoming = graph.get_incoming_nodes(node_id)
+
+        intersection_obj = None
+
+        if itype == "TRAFFIC_LIGHT":
+            duration = int(params.get("duration", 50))
+            intersection_obj = TrafficLightIntersection(node_id, incoming, duration)
+
+        # --- FUTURE EXTENSION ---
+        # elif itype == "STOP_SIGN":
+        #     intersection_obj = StopIntersection(node_id, incoming)
+
+        if intersection_obj:
+            graph.add_intersection(intersection_obj)
