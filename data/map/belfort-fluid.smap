@@ -32,7 +32,7 @@ GRAPH(fluid):
     UEDGE CITADELLE PLACE_ARMES distance=30 vmax=2 density_max=0.8
 
     BEDGE MARCHE_VOSGES ETANG_FORGES distance=60 vmax=6 density_max=0.4
-    BEDGE PLACE_ARMES ETANG_FORGES distance=50 vmax=6 density_max=0.4
+    UEDGE PLACE_ARMES ETANG_FORGES distance=50 vmax=6 density_max=0.4
 
 INTERSECTIONS:
     TRAFFIC_LIGHT PLACE_CORBIS duration=20
@@ -42,8 +42,8 @@ INTERSECTIONS:
 VEHICLES:
 
 SPAWNERS:
-    SPAWNER GARE ratio=0.3
-    SPAWNER IUT ratio=0.2
+    SPAWNER GARE ratio=0.15
+    SPAWNER IUT ratio=0.1
     SPAWNER ETANG_FORGES ratio=0.2
 
     SPAWNER ALSTOM ratio=0.1

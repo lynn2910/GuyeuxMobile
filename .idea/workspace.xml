@@ -4,12 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="34ca026d-ff22-4622-8518-3eb132e69b03" name="Changes" comment="feat: implement intersection parsing and traffic light logic">
+    <list default="true" id="34ca026d-ff22-4622-8518-3eb132e69b03" name="Changes" comment="feat: update edge parameters and improve vehicle handling logic">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/map/belfort-fluid.smap" beforeDir="false" afterPath="$PROJECT_DIR$/data/map/belfort-fluid.smap" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/simulation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/simulation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/edges/cellular.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/edges/cellular.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/edges/fluid.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/edges/fluid.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/results/belfort-fluid.png" beforeDir="false" afterPath="$PROJECT_DIR$/data/results/belfort-fluid.png" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -193,7 +191,7 @@
       <workItem from="1765380302227" duration="796000" />
       <workItem from="1765492797417" duration="337000" />
       <workItem from="1765818754594" duration="130000" />
-      <workItem from="1765818911709" duration="7285000" />
+      <workItem from="1765818911709" duration="8021000" />
     </task>
     <task id="LOCAL-00001" summary="feat: Add parser with a syntax for map declaration">
       <option name="closed" value="true" />
@@ -315,7 +313,15 @@
       <option name="project" value="LOCAL" />
       <updated>1765833968349</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="feat: update edge parameters and improve vehicle handling logic">
+      <option name="closed" value="true" />
+      <created>1765834984164</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1765834984164</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -337,7 +343,8 @@
     <MESSAGE value="feat: enhance vehicle rendering with trail effect and improve spawner ratios" />
     <MESSAGE value="feat: add intersection logic with traffic light control and refactor edge models" />
     <MESSAGE value="feat: implement intersection parsing and traffic light logic" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: implement intersection parsing and traffic light logic" />
+    <MESSAGE value="feat: update edge parameters and improve vehicle handling logic" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: update edge parameters and improve vehicle handling logic" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -351,7 +358,7 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Modelisation_math$Belfort__fluid_.coverage" NAME="Belfort (fluid) Coverage Results" MODIFIED="1765834835306" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
+    <SUITE FILE_PATH="coverage/Modelisation_math$Belfort__fluid_.coverage" NAME="Belfort (fluid) Coverage Results" MODIFIED="1765835532285" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
     <SUITE FILE_PATH="coverage/Modelisation_math$Belfort__cellular_.coverage" NAME="Belfort (cellular) Coverage Results" MODIFIED="1765834082470" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
     <SUITE FILE_PATH="coverage/Modelisation_math$Main.coverage" NAME="TEst Coverage Results" MODIFIED="1764618729521" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
     <SUITE FILE_PATH="coverage/Modelisation_math$TEst__no_visualizer_.coverage" NAME="TEst (no visualizer) Coverage Results" MODIFIED="1765371151223" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
