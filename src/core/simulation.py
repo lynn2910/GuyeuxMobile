@@ -6,6 +6,7 @@ from cli import debug_log
 class Simulation:
     """
     Manages the main simulation loop and state.
+    OPTIMIZED VERSION with better performance.
     """
 
     def __init__(self, graph, tps: float, visualizer=None):
@@ -19,12 +20,15 @@ class Simulation:
         self.since_last_update = 0
         self.visualizer = visualizer
 
-        # CORRECTION ICI : On stocke le tuple (source, destination, objet_edge)
-        # pour avoir accès à src et dst dans la boucle.
+        # Cache des edges avec seulement ceux qui ont des véhicules
+        self.active_edges_cache = []
         self.all_edges_cache = [
             (u, v, data['object'])
             for u, v, data in self.graph.get_edges()
         ]
+
+        # Compteur pour mettre à jour le cache périodiquement
+        self._cache_update_counter = 0
 
     def add_vehicle(self, vehicle, start_edge):
         vehicle.current_edge = start_edge
@@ -56,7 +60,25 @@ class Simulation:
         elapsed = time() - start_time
         self.since_last_update += elapsed
 
+    def _update_active_edges_cache(self):
+        """
+        Met à jour le cache des edges actifs (contenant des véhicules).
+        OPTIMIZATION: Évite d'itérer sur tous les edges à chaque tick.
+        """
+        self.active_edges_cache = [
+            (src, dst, edge)
+            for src, dst, edge in self.all_edges_cache
+            if (hasattr(edge, 'vehicles') and edge.vehicles) or
+               (hasattr(edge, 'cells') and any(cell is not None for cell in edge.cells))
+        ]
+
     def internal_step(self):
+        # Mettre à jour le cache tous les 10 ticks pour équilibrer performance/précision
+        self._cache_update_counter += 1
+        if self._cache_update_counter >= 10:
+            self._update_active_edges_cache()
+            self._cache_update_counter = 0
+
         # 1. Update traffic lights
         self.graph.update_intersections()
 
@@ -68,12 +90,22 @@ class Simulation:
                 if config.DEBUG:
                     debug_log(f"Spawned vehicle {new_vehicle.id} at {spawner.node}")
 
-        for src, dst, edge in self.all_edges_cache:
-            if hasattr(edge, 'vehicles') and not edge.vehicles:
-                continue
+        # 3. Update edges - utiliser le cache si disponible, sinon tous les edges
+        edges_to_update = self.active_edges_cache if self.active_edges_cache else self.all_edges_cache
+
+        for src, dst, edge in edges_to_update:
+            # Skip empty edges in cellular model
+            if hasattr(edge, 'cells'):
+                if not any(cell is not None for cell in edge.cells):
+                    continue
+            # Skip empty edges in fluid model
+            elif hasattr(edge, 'vehicles'):
+                if not edge.vehicles:
+                    continue
 
             edge.update()
 
+            # Vérifier si un véhicule peut passer à l'edge suivant
             if hasattr(edge, 'peek_last_vehicle') and edge.peek_last_vehicle():
                 vehicle = edge.peek_last_vehicle()
 
