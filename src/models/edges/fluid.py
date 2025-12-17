@@ -1,7 +1,6 @@
 from models.edges.base_edge import BaseEdge
 from entities.vehicle import Vehicle
 import random
-import pygame
 
 
 class FluidEdge(BaseEdge):
@@ -114,14 +113,16 @@ class FluidEdge(BaseEdge):
             return leader
         return None
 
-    def draw_edge(self, src_pos: tuple, dst_pos: tuple, screen, vehicle_color):
-        """Draws the vehicles on the edge using Pygame."""
+    def get_vehicle_positions(self):
+        """
+        Returns a generator of (vehicle, position_ratio) for rendering.
+        """
+        if not self.vehicles or self.distance == 0:
+            return
+
         for vehicle in self.vehicles:
-            pos_ratio = self.positions[vehicle.id] / self.distance
-            # Interpolate position along the edge vector
-            x = src_pos[0] + pos_ratio * (dst_pos[0] - src_pos[0])
-            y = src_pos[1] + pos_ratio * (dst_pos[1] - src_pos[1])
-            pygame.draw.circle(screen, vehicle_color, (int(x), int(y)), 5)
+            pos = self.positions.get(vehicle.id, 0.0)
+            yield vehicle, pos / self.distance
 
     def get_infos(self) -> list:
         """Returns a list of strings with statistics about the edge."""
