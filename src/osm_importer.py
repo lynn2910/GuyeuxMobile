@@ -552,7 +552,7 @@ Examples:
     )
 
     print("\n🎉 Done! You can now run:")
-    print(f"   python main.py --map {args.output} --tps {args.tps} --visualizer")
+    print(f"   python src/main.py --map {args.output} --tps {args.tps} --visualizer")
 
 
 if __name__ == "__main__":
