@@ -42,7 +42,7 @@ class Parser:
         """
         token = self.current_token()
         if token.type != token_type:
-            raise SyntaxError(f"Expected {token_type}, found {token.type} at line {token.line}")
+            raise SyntaxError(f"Expected {token_type}, found {token.type} ('{token.value}') at line {token.line}")
         self.advance()
         return token
 

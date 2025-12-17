@@ -4,25 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="34ca026d-ff22-4622-8518-3eb132e69b03" name="Changes" comment="feat: implement traffic light rendering and improve visual parameters">
+    <list default="true" id="34ca026d-ff22-4622-8518-3eb132e69b03" name="Changes" comment="feat: refactor vehicle rendering logic and add position generator">
+      <change afterPath="$PROJECT_DIR$/src/osm_importer.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/cli.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/cli.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/fs/parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/fs/parser.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/fs/tokenizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/fs/tokenizer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/graph.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/graph.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/simulation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/simulation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/utils.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/entities/vehicle.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/entities/vehicle.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/entities/vehicle_spawner.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/entities/vehicle_spawner.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/edges/base_edge.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/edges/base_edge.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/edges/cellular.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/edges/cellular.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/edges/fluid.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/edges/fluid.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/intersections/base_intersection.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/intersections/base_intersection.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/intersections/traffic_light_intersection.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/intersections/traffic_light_intersection.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ui/renderer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ui/renderer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ui/visualizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ui/visualizer.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,6 +81,7 @@
       <recent name="R:\IUT_Code\S5\Modelisation_math\data\map" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="R:\IUT_Code\S5\Modelisation_math\src" />
       <recent name="R:\IUT_Code\S5\Modelisation_math\src\models\edges" />
       <recent name="R:\IUT_Code\S5\Modelisation_math\src\entities" />
     </key>
@@ -207,7 +194,7 @@
       <workItem from="1765492797417" duration="337000" />
       <workItem from="1765818754594" duration="130000" />
       <workItem from="1765818911709" duration="10431000" />
-      <workItem from="1765966039920" duration="1095000" />
+      <workItem from="1765966039920" duration="2164000" />
     </task>
     <task id="LOCAL-00001" summary="feat: Add parser with a syntax for map declaration">
       <option name="closed" value="true" />
@@ -353,7 +340,23 @@
       <option name="project" value="LOCAL" />
       <updated>1765836723016</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="feat: documentation">
+      <option name="closed" value="true" />
+      <created>1765967167159</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1765967167159</updated>
+    </task>
+    <task id="LOCAL-00020" summary="feat: refactor vehicle rendering logic and add position generator">
+      <option name="closed" value="true" />
+      <created>1765967339556</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1765967339556</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -378,7 +381,9 @@
     <MESSAGE value="feat: update edge parameters and improve vehicle handling logic" />
     <MESSAGE value="feat: update edge types and adjust vehicle spawner ratios" />
     <MESSAGE value="feat: implement traffic light rendering and improve visual parameters" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: implement traffic light rendering and improve visual parameters" />
+    <MESSAGE value="feat: documentation" />
+    <MESSAGE value="feat: refactor vehicle rendering logic and add position generator" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: refactor vehicle rendering logic and add position generator" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -392,7 +397,7 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Modelisation_math$Belfort__fluid_.coverage" NAME="Belfort (fluid) Coverage Results" MODIFIED="1765967139503" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
+    <SUITE FILE_PATH="coverage/Modelisation_math$Belfort__fluid_.coverage" NAME="Belfort (fluid) Coverage Results" MODIFIED="1765967253451" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
     <SUITE FILE_PATH="coverage/Modelisation_math$Belfort__cellular_.coverage" NAME="Belfort (cellular) Coverage Results" MODIFIED="1765966871078" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
     <SUITE FILE_PATH="coverage/Modelisation_math$Main.coverage" NAME="TEst Coverage Results" MODIFIED="1764618729521" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
     <SUITE FILE_PATH="coverage/Modelisation_math$TEst__no_visualizer_.coverage" NAME="TEst (no visualizer) Coverage Results" MODIFIED="1765371151223" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
