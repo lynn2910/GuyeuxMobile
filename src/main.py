@@ -46,10 +46,10 @@ def run_simulation_from_file(file_path: str, tps: float, show_viz: bool):
     print(f"Spawners: {len(spawners)}")
 
     # Generate a static image of the graph layout.
-    print("\nGenerating graph map image...")
-    file_name = path.basename(file_path).split('.')[0]
-    graph.show_map(file_name)
-    print(f"Map image saved to data/results/{file_name}.png")
+    # print("\nGenerating graph map image...")
+    # file_name = path.basename(file_path).split('.')[0]
+    # graph.show_map(file_name)
+    # print(f"Map image saved to data/results/{file_name}.png")
 
     # Initialize the visualizer if requested.
     viz = None

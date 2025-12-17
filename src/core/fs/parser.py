@@ -46,6 +46,17 @@ class Parser:
         self.advance()
         return token
 
+    def expect_identifier_or_number(self) -> Token:
+        """
+        Consumes the current token if it's an IDENTIFIER or a NUMBER.
+        This is used for node IDs which can be strings or numbers.
+        """
+        token = self.current_token()
+        if token.type not in [TokenType.IDENTIFIER, TokenType.NUMBER]:
+            raise SyntaxError(f"Expected {TokenType.IDENTIFIER} or {TokenType.NUMBER}, found {token.type} ('{token.value}') at line {token.line}")
+        self.advance()
+        return token
+
     def skip_newlines(self):
         """Advances past any sequential NEWLINE tokens."""
         while self.current_token().type == TokenType.NEWLINE:
@@ -90,7 +101,7 @@ class Parser:
     def parse_node(self) -> Tuple[str, float, float]:
         """Parses a NODE definition line."""
         self.expect(TokenType.NODE)
-        node_id = self.expect(TokenType.IDENTIFIER).value
+        node_id = self.expect_identifier_or_number().value
         self.expect(TokenType.LPAREN)
         x = self.expect(TokenType.NUMBER).value
         self.expect(TokenType.COMMA)
@@ -101,8 +112,8 @@ class Parser:
     def parse_edge(self, edge_type: TokenType) -> Tuple[str, str, dict]:
         """Parses a UEDGE or BEDGE definition line."""
         self.expect(edge_type)
-        from_node = self.expect(TokenType.IDENTIFIER).value
-        to_node = self.expect(TokenType.IDENTIFIER).value
+        from_node = self.expect_identifier_or_number().value
+        to_node = self.expect_identifier_or_number().value
 
         # Parse optional key-value parameters for the edge.
         params = {}
@@ -140,7 +151,7 @@ class Parser:
         while self.current_token().type == TokenType.SPAWNER:
             # Format: SPAWNER NodeID ratio=0.5
             self.expect(TokenType.SPAWNER)
-            node_id = self.expect(TokenType.IDENTIFIER).value
+            node_id = self.expect_identifier_or_number().value
 
             params = {}
             while self.current_token().type == TokenType.IDENTIFIER:
@@ -156,15 +167,12 @@ class Parser:
     def parse_car(self) -> dict:
         """Parses a CAR definition line."""
         self.expect(TokenType.CAR)
-        try:
-            car_id = self.expect(TokenType.IDENTIFIER).value
-        except SyntaxError:
-            car_id = self.expect(TokenType.NUMBER).value
+        car_id = self.expect_identifier_or_number().value
 
         self.expect(TokenType.LPAREN)
-        start_node = self.expect(TokenType.IDENTIFIER).value
+        start_node = self.expect_identifier_or_number().value
         self.expect(TokenType.COMMA)
-        end_node = self.expect(TokenType.IDENTIFIER).value
+        end_node = self.expect_identifier_or_number().value
         self.expect(TokenType.RPAREN)
 
         return {
@@ -190,7 +198,7 @@ class Parser:
             if self.current_token().type == TokenType.TRAFFIC_LIGHT:
                 intersection_type = "TRAFFIC_LIGHT"
                 self.expect(TokenType.TRAFFIC_LIGHT)
-                node_id = self.expect(TokenType.IDENTIFIER).value
+                node_id = self.expect_identifier_or_number().value
 
                 # Parse specific parameters for traffic lights.
                 while self.current_token().type == TokenType.IDENTIFIER:

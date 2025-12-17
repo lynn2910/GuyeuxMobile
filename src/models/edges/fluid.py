@@ -10,6 +10,7 @@ class FluidEdge(BaseEdge):
     This class simulates traffic as a continuous flow, inspired by the Lighthill-Whitham-Richards (LWR) model.
     Vehicle speed is a function of the local traffic density. Vehicles have continuous positions along the edge.
     """
+
     def __init__(self, distance: int, vmax: int, density_max: float = 0.2):
         """
         Initializes the fluid-dynamic edge.
@@ -153,14 +154,17 @@ class FluidEdge(BaseEdge):
         edge = data['object']
         # Travel time = distance / speed.
         base_time = edge.distance / edge.vmax if edge.vmax > 0 else float('inf')
-        
+
         count = len(edge.vehicles)
         if count == 0:
             return base_time
 
         # Calculate speed based on current density
         density = count / edge.distance
-        speed_factor = max(0.01, 1.0 - (density / edge.density_max)**2) # Avoid division by zero
+        speed_factor = max(0.01, 1.0 - (density / edge.density_max) ** 2)  # Avoid division by zero
         current_speed = edge.vmax * speed_factor
-        
+
+        if current_speed <= 0:
+            return -1
+
         return edge.distance / current_speed
