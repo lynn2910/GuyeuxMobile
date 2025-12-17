@@ -64,18 +64,14 @@ class Renderer:
     def draw_traffic_lights(self, graph, camera_convert_func, zoom: float, visible_nodes=None):
         """
         Draws indicators for traffic lights at intersections.
-        OPTIMIZED: Cache les calculs de position.
+        OPTIMIZED: Cache les calculs de position. Nouveau style visuel.
         """
-        if zoom < 0.5:
+        # Ne dessiner les feux qu'à partir d'un certain zoom
+        if zoom < 0.3:
             return
 
-        # Calculs visuels basés sur le zoom
-        node_radius_visual = max(10, min(35, Sizes.NODE_RADIUS_BASE * zoom))
-        road_width_visual = max(2, min(20, Sizes.ROAD_WIDTH_BASE * zoom))
-        light_radius = max(4, int(Sizes.TRAFFIC_LIGHT_RADIUS * zoom))
-
-        offset_back_px = node_radius_visual + 5
-        offset_side_px = (road_width_visual / 2) + light_radius + 2
+        # Tailles adaptatives
+        light_size = max(3, min(8, int(4 * zoom)))
 
         for node_id, intersection in graph.intersections.items():
             if not hasattr(intersection, "get_state"):
@@ -87,26 +83,41 @@ class Renderer:
             node_data = graph.get_node(node_id)
             cx, cy = camera_convert_func((node_data['x'], node_data['y']))
 
-            for inc_node in graph.get_incoming_nodes(node_id):
+            incoming_nodes = graph.get_incoming_nodes(node_id)
+            num_incoming = len(incoming_nodes)
+
+            if num_incoming == 0:
+                continue
+
+            # Disposition circulaire autour du nœud
+            node_radius = max(10, min(35, Sizes.NODE_RADIUS_BASE * zoom * 0.6))
+            light_distance = node_radius + light_size + 4
+
+            angle_step = 2 * math.pi / num_incoming
+
+            for i, inc_node in enumerate(incoming_nodes):
                 state = intersection.get_state(inc_node)
-                color = Colors.TL_GREEN if state == "GREEN" else Colors.TL_RED
 
-                inc_data = graph.get_node(inc_node)
-                ix, iy = camera_convert_func((inc_data['x'], inc_data['y']))
+                # Couleurs plus visibles
+                if state == "GREEN":
+                    color = (50, 255, 100)  # Vert vif
+                    glow_color = (30, 200, 80)
+                else:
+                    color = (255, 50, 50)  # Rouge vif
+                    glow_color = (200, 30, 30)
 
-                vx, vy = ix - cx, iy - cy
-                dist = math.hypot(vx, vy)
-                if dist < 1:
-                    continue
+                # Position circulaire
+                angle = i * angle_step - math.pi / 2  # Commencer en haut
+                lx = cx + math.cos(angle) * light_distance
+                ly = cy + math.sin(angle) * light_distance
 
-                ux, uy = vx / dist, vy / dist
-                px, py = -uy, ux
+                # Effet de glow si zoom suffisant
+                if zoom > 0.6:
+                    pygame.draw.circle(self.screen, glow_color, (int(lx), int(ly)), light_size + 2, 1)
 
-                lx = cx + (ux * offset_back_px) + (px * offset_side_px)
-                ly = cy + (uy * offset_back_px) + (py * offset_side_px)
-
-                pygame.draw.circle(self.screen, Colors.TL_OUTLINE, (int(lx), int(ly)), light_radius + 1)
-                pygame.draw.circle(self.screen, color, (int(lx), int(ly)), light_radius)
+                # Feu principal
+                pygame.draw.circle(self.screen, (40, 40, 40), (int(lx), int(ly)), light_size + 1)
+                pygame.draw.circle(self.screen, color, (int(lx), int(ly)), light_size)
 
     def draw_edge(self, src_pos: Tuple[float, float], dst_pos: Tuple[float, float],
                   edge, src: str, dst: str, is_hovered: bool, zoom: float):
@@ -222,39 +233,44 @@ class Renderer:
     def draw_node(self, pos: Tuple[float, float], node_id: str, is_hovered: bool, zoom: float):
         """
         Draws a single intersection node.
-        OPTIMIZED: Adapte le rendu au zoom.
+        OPTIMIZED: Adapte le rendu au zoom avec tailles réduites.
         """
         # Ne pas dessiner les nœuds à très petite échelle
         if zoom < 0.15:
             return
 
-        scaled_radius = Sizes.NODE_RADIUS_BASE * zoom
+        # Tailles réduites pour éviter la surcharge visuelle
+        base_radius = Sizes.NODE_RADIUS_BASE * 0.6  # 40% plus petit
+        scaled_radius = base_radius * zoom
 
-        # Réduire la taille des nœuds à petite échelle pour éviter la surcharge
+        # Réduction supplémentaire à petite échelle
         if zoom < 0.5:
+            scaled_radius *= 0.5
+        elif zoom < 1.0:
             scaled_radius *= 0.7
 
-        radius = int(max(6, min(35, scaled_radius)))
+        radius = int(max(3, min(20, scaled_radius)))  # Max réduit de 35 à 20
 
         if is_hovered:
-            radius += 3
+            radius += 2
 
-        outline_width = max(1, min(4, int(Sizes.NODE_OUTLINE_WIDTH * zoom)))
+        outline_width = max(1, min(3, int(Sizes.NODE_OUTLINE_WIDTH * zoom)))
         x, y = int(pos[0]), int(pos[1])
 
-        fill_color = Colors.NODE_HOVER if is_hovered else Colors.NODE_BASE
+        # Couleur gris foncé au lieu de blanc
+        fill_color = Colors.NODE_HOVER if is_hovered else (80, 80, 80)
 
         # Dessiner avec antialiasing seulement si le zoom est suffisant
         if zoom > 0.5:
             pygame.draw.circle(self.screen, fill_color, (x, y), radius)
             pygame.draw.circle(self.screen, Colors.NODE_OUTLINE, (x, y), radius, outline_width)
         else:
-            # Version simplifiée sans outline à petite échelle
+            # Version simplifiée à petite échelle
             pygame.draw.circle(self.screen, fill_color, (x, y), radius)
 
         # Labels seulement à grand zoom
-        if radius > 15 and zoom > 1.2:
-            font = self.font_medium if radius > 25 else self.font_tiny
+        if radius > 12 and zoom > 1.5:
+            font = self.font_medium if radius > 18 else self.font_tiny
             text_surf = font.render(str(node_id), True, Colors.TEXT)
             text_rect = text_surf.get_rect(center=(x, y))
             self.screen.blit(text_surf, text_rect)

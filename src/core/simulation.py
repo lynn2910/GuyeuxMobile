@@ -1,4 +1,4 @@
-from time import sleep, time
+from time import time
 import config
 from cli import debug_log
 
@@ -6,7 +6,7 @@ from cli import debug_log
 class Simulation:
     """
     Manages the main simulation loop and state.
-    OPTIMIZED VERSION with better performance.
+    OPTIMIZED VERSION with UI/simulation separation for better performance.
     """
 
     def __init__(self, graph, tps: float, visualizer=None):
@@ -17,8 +17,11 @@ class Simulation:
         self.tick_duration = 1.0 / tps
         self.t = 0
         self.running = False
-        self.since_last_update = 0
         self.visualizer = visualizer
+
+        # Séparation UI/Simulation
+        self.simulation_accumulator = 0.0
+        self.last_frame_time = time()
 
         # Cache des edges avec seulement ceux qui ont des véhicules
         self.active_edges_cache = []
@@ -45,20 +48,35 @@ class Simulation:
             pass
 
     def tick(self):
-        start_time = time()
-        if self.since_last_update >= self.tick_duration:
-            self.t += 1
-            self.internal_step()
-            self.since_last_update -= self.tick_duration
+        """
+        Main loop avec séparation UI/Simulation.
+        La simulation tourne à tps fixe, l'UI à frame rate variable.
+        """
+        current_time = time()
+        frame_time = current_time - self.last_frame_time
+        self.last_frame_time = current_time
 
+        # Limiter le frame_time pour éviter le spiral of death
+        if frame_time > 0.25:
+            frame_time = 0.25
+
+        self.simulation_accumulator += frame_time
+
+        # Faire tourner la simulation à fréquence fixe (tps)
+        simulation_steps = 0
+        max_steps = 5  # Éviter trop de steps si on est en retard
+
+        while self.simulation_accumulator >= self.tick_duration and simulation_steps < max_steps:
+            self.internal_step()
+            self.t += 1
+            self.simulation_accumulator -= self.tick_duration
+            simulation_steps += 1
+
+        # Mettre à jour l'UI indépendamment (frame rate libre)
         if self.visualizer:
             self.visualizer.update(self.t)
             if not self.visualizer.handle_events():
                 self.running = False
-                return
-
-        elapsed = time() - start_time
-        self.since_last_update += elapsed
 
     def _update_active_edges_cache(self):
         """
@@ -73,6 +91,9 @@ class Simulation:
         ]
 
     def internal_step(self):
+        """
+        Un pas de simulation (appelé à fréquence fixe).
+        """
         # Mettre à jour le cache tous les 10 ticks pour équilibrer performance/précision
         self._cache_update_counter += 1
         if self._cache_update_counter >= 10:
