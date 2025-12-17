@@ -4,11 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="34ca026d-ff22-4622-8518-3eb132e69b03" name="Changes" comment="feat: add OSM importer for converting OpenStreetMap data to .smap format">
+    <list default="true" id="34ca026d-ff22-4622-8518-3eb132e69b03" name="Changes" comment="feat: add migration state service and enhance parser for identifier handling">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/fs/parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/fs/parser.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/edges/fluid.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/edges/fluid.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ui/renderer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ui/renderer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ui/visualizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ui/visualizer.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -195,7 +194,7 @@
       <workItem from="1765818754594" duration="130000" />
       <workItem from="1765818911709" duration="10431000" />
       <workItem from="1765966039920" duration="2577000" />
-      <workItem from="1765968660396" duration="107000" />
+      <workItem from="1765968660396" duration="391000" />
     </task>
     <task id="LOCAL-00001" summary="feat: Add parser with a syntax for map declaration">
       <option name="closed" value="true" />
@@ -365,7 +364,15 @@
       <option name="project" value="LOCAL" />
       <updated>1765968280132</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="feat: add migration state service and enhance parser for identifier handling">
+      <option name="closed" value="true" />
+      <created>1765973830756</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1765973830756</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -393,7 +400,8 @@
     <MESSAGE value="feat: documentation" />
     <MESSAGE value="feat: refactor vehicle rendering logic and add position generator" />
     <MESSAGE value="feat: add OSM importer for converting OpenStreetMap data to .smap format" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add OSM importer for converting OpenStreetMap data to .smap format" />
+    <MESSAGE value="feat: add migration state service and enhance parser for identifier handling" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add migration state service and enhance parser for identifier handling" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

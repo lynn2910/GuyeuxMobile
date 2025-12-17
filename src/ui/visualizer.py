@@ -118,33 +118,38 @@ class Visualizer:
         self.clock.tick(Animation.TARGET_FPS)
 
     def _render(self):
-        """The main drawing sequence for a single frame."""
         self.renderer.clear()
         zoom = self.camera.zoom
 
-        # 1. Draw all edges and the vehicles on them.
+        min_x, max_x, min_y, max_y = self._get_visible_bounds()
+
+        visible_nodes = set()
+        for node_id, pos in self.world_positions.items():
+            if min_x <= pos[0] <= max_x and min_y <= pos[1] <= max_y:
+                visible_nodes.add(node_id)
+                screen_pos = self.camera.world_to_screen(pos)
+                is_hovered = node_id == self.hovered_node
+                self.renderer.draw_node(screen_pos, node_id, is_hovered, zoom)
+
         for src, dst, data in self.graph.get_edges():
+            if src not in visible_nodes and dst not in visible_nodes:
+                continue
+
             src_screen = self.camera.world_to_screen(self.world_positions[src])
             dst_screen = self.camera.world_to_screen(self.world_positions[dst])
-            is_hovered = self.hovered_edge and self.hovered_edge[0] == src and self.hovered_edge[1] == dst
+
+            is_hovered = self.hovered_edge and \
+                         self.hovered_edge[0] == src and self.hovered_edge[1] == dst
+
             self.renderer.draw_edge(src_screen, dst_screen, data['object'], src, dst, is_hovered, zoom)
 
-        # 2. Draw all nodes.
-        for node_id, world_pos in self.world_positions.items():
-            screen_pos = self.camera.world_to_screen(world_pos)
-            is_hovered = node_id == self.hovered_node
-            self.renderer.draw_node(screen_pos, node_id, is_hovered, zoom)
+        self.renderer.draw_traffic_lights(self.graph, self.camera.world_to_screen, zoom, visible_nodes)
 
-        # 3. Draw traffic lights.
-        self.renderer.draw_traffic_lights(self.graph, self.camera.world_to_screen, zoom)
-
-        # 4. Draw UI overlays (tick counter, help text, legend).
         self.renderer.draw_tick_counter(self.current_tick)
-        self.renderer.draw_controls_help()
         if self.show_legend:
             self.renderer.draw_legend(self.width, self.height)
 
-        # 5. Draw info boxes for hovered elements.
+        # Info boxes
         if self.hovered_node:
             self._draw_node_info(self._get_mouse_pos(), self.hovered_node)
         elif self.hovered_edge:
@@ -194,6 +199,12 @@ class Visualizer:
             elif event.type == pygame.MOUSEMOTION:
                 if self.camera.is_panning: self.camera.update_pan(event.pos)
         return True
+
+    def _get_visible_bounds(self):
+        margin = 100
+        min_x, min_y = self.camera.screen_to_world((-margin, -margin))
+        max_x, max_y = self.camera.screen_to_world((self.width + margin, self.height + margin))
+        return min_x, max_x, min_y, max_y
 
     @staticmethod
     def close():

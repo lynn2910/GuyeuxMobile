@@ -15,6 +15,7 @@ class Renderer:
     Manages all drawing operations for the simulation, including the graph,
     vehicles, and user interface overlays.
     """
+
     def __init__(self, screen: pygame.Surface):
         self.screen = screen
         pygame.font.init()
@@ -47,12 +48,15 @@ class Renderer:
         """Checks if an edge is part of a bidirectional pair."""
         return tuple(sorted((src, dst))) in self.bidirectional_edges
 
-    def draw_traffic_lights(self, graph, camera_convert_func, zoom: float):
+    def draw_traffic_lights(self, graph, camera_convert_func, zoom: float, visible_nodes=None):
         """
         Draws indicators for traffic lights at intersections.
         The positions are calculated in screen space to ensure they align
         correctly with the rendered nodes and edges, regardless of zoom.
         """
+        if zoom < 0.5:
+            return
+
         # Define visual sizes based on zoom level, clamped to a min/max range.
         node_radius_visual = max(10, min(35, Sizes.NODE_RADIUS_BASE * zoom))
         road_width_visual = max(2, min(20, Sizes.ROAD_WIDTH_BASE * zoom))
@@ -64,6 +68,9 @@ class Renderer:
 
         for node_id, intersection in graph.intersections.items():
             if not hasattr(intersection, "get_state"):
+                continue
+
+            if visible_nodes is not None and node_id not in visible_nodes:
                 continue
 
             # Get the screen coordinates of the intersection's center.
@@ -149,7 +156,8 @@ class Renderer:
                     y_prev = start_pos[1] + t_prev * dy_total
                     trail_color = (100, 150, 220)
                     trail_width = max(2, vehicle_radius)
-                    pygame.draw.line(self.screen, trail_color, (int(x_prev), int(y_prev)), (int(x), int(y)), trail_width)
+                    pygame.draw.line(self.screen, trail_color, (int(x_prev), int(y_prev)), (int(x), int(y)),
+                                     trail_width)
 
                 # Draw the vehicle itself. Color it red if it's stopped.
                 color = Colors.VEHICLE if vehicle.speed > 0 else (200, 50, 50)
@@ -181,6 +189,9 @@ class Renderer:
 
     def draw_node(self, pos: Tuple[float, float], node_id: str, is_hovered: bool, zoom: float):
         """Draws a single intersection node."""
+        if zoom < 0.2:
+            return
+
         scaled_radius = Sizes.NODE_RADIUS_BASE * zoom
         radius = int(max(10, min(35, scaled_radius)))
         if is_hovered:
@@ -194,7 +205,7 @@ class Renderer:
         pygame.draw.circle(self.screen, Colors.NODE_OUTLINE, (x, y), radius, outline_width)
 
         # Draw the node's ID if zoomed in enough.
-        if radius > 15:
+        if radius > 15 and zoom > 1.2:
             font = self.font_medium if radius > 25 else self.font_tiny
             text_surf = font.render(str(node_id), True, Colors.TEXT)
             text_rect = text_surf.get_rect(center=(x, y))
@@ -212,7 +223,7 @@ class Renderer:
         max_w = max(surf.get_width() for surf in rendered_lines) if rendered_lines else 0
         box_w = max_w + padding * 2
         box_h = len(rendered_lines) * line_height + padding
-        
+
         # Position box, ensuring it stays on screen.
         x, y = pos
         sw, sh = self.screen.get_size()
@@ -265,7 +276,8 @@ class Renderer:
 
         # Draw labels.
         self.screen.blit(self.font_tiny.render("Low", True, Colors.TEXT_DIM), (gradient_x + 25, gradient_y))
-        self.screen.blit(self.font_tiny.render("High", True, Colors.TEXT_DIM), (gradient_x + 25, gradient_y + gradient_h - 10))
+        self.screen.blit(self.font_tiny.render("High", True, Colors.TEXT_DIM),
+                         (gradient_x + 25, gradient_y + gradient_h - 10))
 
     def _get_traffic_color_for_legend(self, occupation: float) -> Tuple[int, int, int]:
         """Helper to get traffic color for a given ratio, matching the main logic."""
