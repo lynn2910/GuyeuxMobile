@@ -2,6 +2,8 @@
 OSM Importer - Imports real road networks from OpenStreetMap using OSMnx
 and converts them to the simulation's internal .smap format.
 
+FIXED VERSION: Corrige les problèmes d'import et améliore la qualité du réseau.
+
 Usage:
     # Download by city name
     python osm_importer.py --city "Belfort, France" --output belfort_osm.smap --model cellular
@@ -350,19 +352,34 @@ def write_smap_file(output_path: str, nodes: Dict, edges: List,
     """
     print(f"💾 Writing .smap file to {output_path}...")
 
-    with open(output_path, 'w') as f:
+    with open(output_path, 'w', encoding='utf-8') as f:
         # Write header
         f.write(f"GRAPH({model}):\n")
 
-        # Write nodes
-        for node_id, (x, y) in sorted(nodes.items()):
+        # Write nodes - IMPORTANT: Trier par ID pour assurer la cohérence
+        sorted_nodes = sorted(nodes.items(), key=lambda x: int(x[0]) if x[0].isdigit() else x[0])
+        for node_id, (x, y) in sorted_nodes:
             f.write(f"    NODE {node_id} ({x:.1f}, {y:.1f})\n")
 
         f.write("\n")
 
-        # Write edges
+        # Write edges - IMPORTANT: Vérifier que les nœuds source et destination existent
         processed = set()
+        valid_edges = []
+
+        # Filtrer les edges invalides
         for src, dst, distance, props in edges:
+            if src not in nodes or dst not in nodes:
+                print(f"⚠️  Skipping invalid edge {src} -> {dst} (missing nodes)")
+                continue
+            if src == dst:
+                print(f"⚠️  Skipping self-loop {src} -> {dst}")
+                continue
+            valid_edges.append((src, dst, distance, props))
+
+        print(f"✅ Validated {len(valid_edges)}/{len(edges)} edges")
+
+        for src, dst, distance, props in valid_edges:
             if (src, dst) in processed:
                 continue
 
@@ -396,15 +413,19 @@ def write_smap_file(output_path: str, nodes: Dict, edges: List,
 
         # Count incoming edges for each node
         incoming_count = defaultdict(int)
-        for src, dst, _, _ in edges:
+        for src, dst, _, _ in valid_edges:
             incoming_count[dst] += 1
 
         # Add traffic lights to nodes with 3+ incoming edges
+        traffic_lights_added = 0
         for node_id, count in sorted(incoming_count.items()):
             if count >= 3:
                 # Duration proportional to number of incoming roads
                 duration = min(100, 30 + count * 10)
                 f.write(f"    TRAFFIC_LIGHT {node_id} duration={duration}\n")
+                traffic_lights_added += 1
+
+        print(f"✅ Added {traffic_lights_added} traffic lights")
 
         # Write vehicles section (empty)
         f.write("\nVEHICLES:\n")
@@ -415,7 +436,7 @@ def write_smap_file(output_path: str, nodes: Dict, edges: List,
 
             # Add spawners to nodes with few outgoing edges (periphery)
             outgoing_count = defaultdict(int)
-            for src, dst, _, _ in edges:
+            for src, dst, _, _ in valid_edges:
                 outgoing_count[src] += 1
 
             # Select nodes with 1-2 outgoing edges
@@ -430,6 +451,8 @@ def write_smap_file(output_path: str, nodes: Dict, edges: List,
             for node_id in sorted(selected_spawners):
                 ratio = 0.1 if outgoing_count[node_id] == 1 else 0.15
                 f.write(f"    SPAWNER {node_id} ratio={ratio}\n")
+
+            print(f"✅ Added {len(selected_spawners)} spawners")
         else:
             f.write("\nSPAWNERS:\n")
 

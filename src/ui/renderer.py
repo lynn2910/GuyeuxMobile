@@ -199,7 +199,7 @@ class Renderer:
         vehicle_radius = int(max(2, min(6, Sizes.VEHICLE_RADIUS * zoom * 0.8)))
 
         # À petite échelle, limiter le nombre de véhicules affichés
-        vehicles_to_draw = edge.get_vehicle_positions()
+        vehicles_to_draw = list(edge.get_vehicle_positions())  # Convertir en liste
         if zoom < 0.5 and len(vehicles_to_draw) > 20:
             vehicles_to_draw = vehicles_to_draw[::3]  # Afficher 1 véhicule sur 3
 
