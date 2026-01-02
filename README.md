@@ -2,8 +2,7 @@
 
 ### Mathematical Modeling Project
 
-![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
-![License](https://img.shields.io/badge/License-MIT-green)
+![Python](https://img.shields.io/badge/Python-3.14%2B-blue)
 ![Status](https://img.shields.io/badge/Status-Active-orange)
 
 ## 📖 Overview

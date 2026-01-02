@@ -4,21 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="34ca026d-ff22-4622-8518-3eb132e69b03" name="Changes" comment="feat: add new `lisle_fluid.smap` map file and configure IntelliJ metadata files">
-      <change afterPath="$PROJECT_DIR$/MAP_FORMAT.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="34ca026d-ff22-4622-8518-3eb132e69b03" name="Changes" comment="feat: rewrite and expand README with detailed project overview, theoretical models, features, and usage instructions">
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ai/routing.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/cli.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/cli.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/fs/parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/fs/parser.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/simulation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/simulation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/osm_importer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/osm_importer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ui/camera.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ui/camera.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ui/geometry.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ui/geometry.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ui/renderer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ui/renderer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ui/styles.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ui/styles.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ui/visualizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ui/visualizer.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -273,7 +260,7 @@
       <workItem from="1765968660396" duration="1947000" />
       <workItem from="1765979662053" duration="2351000" />
       <workItem from="1767346101400" duration="575000" />
-      <workItem from="1767346738733" duration="4786000" />
+      <workItem from="1767346738733" duration="4898000" />
     </task>
     <task id="LOCAL-00001" summary="feat: Add parser with a syntax for map declaration">
       <option name="closed" value="true" />
@@ -523,15 +510,29 @@
       <option name="project" value="LOCAL" />
       <updated>1767347056440</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="feat: refactor simulation classes, optimize UI responsiveness, and improve code clarity">
+      <option name="closed" value="true" />
+      <created>1767355679141</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1767355679141</updated>
+    </task>
+    <task id="LOCAL-00033" summary="feat: rewrite and expand README with detailed project overview, theoretical models, features, and usage instructions">
+      <option name="closed" value="true" />
+      <created>1767355687544</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1767355687544</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: vehicle spawners" />
-    <MESSAGE value="feat: First version of fluid simulation" />
     <MESSAGE value="feat: better visualization for the fluid sim" />
     <MESSAGE value="feat: fix some quirks with the fluid simulation" />
     <MESSAGE value="chore: update todo list" />
@@ -555,7 +556,9 @@
     <MESSAGE value="feat: implement threaded simulation for improved performance and UI responsiveness" />
     <MESSAGE value="Removed outdated Overpass API cached JSON file." />
     <MESSAGE value="feat: add new `lisle_fluid.smap` map file and configure IntelliJ metadata files" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add new `lisle_fluid.smap` map file and configure IntelliJ metadata files" />
+    <MESSAGE value="feat: refactor simulation classes, optimize UI responsiveness, and improve code clarity" />
+    <MESSAGE value="feat: rewrite and expand README with detailed project overview, theoretical models, features, and usage instructions" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: rewrite and expand README with detailed project overview, theoretical models, features, and usage instructions" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
