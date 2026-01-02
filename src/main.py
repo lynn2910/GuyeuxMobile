@@ -3,8 +3,6 @@ Main entry point for the traffic simulation application.
 
 This script handles command-line argument parsing, map file loading,
 and the initialization of the main simulation loop.
-
-THREADING VERSION: Simulation runs in separate thread.
 """
 import os
 from os import path
@@ -17,7 +15,7 @@ from ui.visualizer import Visualizer
 
 def init_required_files_and_folders():
     """
-    Ensures that necessary directories for storing results exist.
+    Ensures that the necessary directories for storing results exist.
     """
     target_path = path.join("data", "results")
     os.makedirs(target_path, exist_ok=True)
@@ -66,19 +64,19 @@ def run_simulation_from_file(file_path: str, tps: float, show_viz: bool):
     print(f"\nLaunching simulation at {tps} TPS... (Press Ctrl+C to stop)")
     print("   Simulation running in SEPARATE THREAD\n")
 
-    # Démarrer le thread de simulation
+    # Start simulation thread
     simulation.start()
 
     try:
-        # Boucle UI (thread principal) - tourne aussi vite que possible
+        # UI Loop (Main Thread)
         while simulation.running.value:
-            # tick() ne fait que l'UI maintenant
+            # tick() only handles UI updates now
             if not simulation.tick():
                 break
     except KeyboardInterrupt:
         print("\n\n⚠️  Simulation interrupted by user.")
     finally:
-        # Arrêter proprement le thread de simulation
+        # Stop simulation thread gracefully
         simulation.stop()
 
         if viz:

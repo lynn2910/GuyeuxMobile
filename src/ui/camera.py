@@ -15,8 +15,9 @@ class Camera:
         """
         Initialize camera.
 
-        :param width: Viewport width
-        :param height: Viewport height
+        Args:
+            width: Viewport width
+            height: Viewport height
         """
         self.width = width
         self.height = height
@@ -63,8 +64,9 @@ class Camera:
         """
         Zoom towards/away from a specific point.
 
-        :param mouse_pos: Mouse position in screen coordinates
-        :param delta: Zoom delta (positive = zoom in, negative = zoom out)
+        Args:
+            mouse_pos: Mouse position in screen coordinates
+            delta: Zoom delta (positive = zoom in, negative = zoom out)
         """
         # Calculate world position before zoom
         world_pos_before = self.screen_to_world(mouse_pos)
@@ -87,8 +89,10 @@ class Camera:
         """
         Convert world coordinates to screen coordinates.
 
-        :param world_pos: Position in world space
-        :return: Position in screen space
+        Args:
+            world_pos: Position in world space
+        Returns:
+            Position in screen space
         """
         wx, wy = world_pos
 
@@ -102,8 +106,10 @@ class Camera:
         """
         Convert screen coordinates to world coordinates.
 
-        :param screen_pos: Position in screen space
-        :return: Position in world space
+        Args:
+            screen_pos: Position in screen space
+        Returns:
+            Position in world space
         """
         sx, sy = screen_pos
 
@@ -124,11 +130,12 @@ class Camera:
         """
         Adjust camera to fit all content in view.
 
-        :param min_x: Minimum X coordinate
-        :param max_x: Maximum X coordinate
-        :param min_y: Minimum Y coordinate
-        :param max_y: Maximum Y coordinate
-        :param margin: Margin around content
+        Args:
+            min_x: Minimum X coordinate
+            max_x: Maximum X coordinate
+            min_y: Minimum Y coordinate
+            max_y: Maximum Y coordinate
+            margin: Margin around content
         """
         # Calculate center
         center_x = (min_x + max_x) / 2

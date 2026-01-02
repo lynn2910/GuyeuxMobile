@@ -27,10 +27,12 @@ def offset_line(start: Tuple[float, float],
     """
     Offset a line segment perpendicular to its direction.
 
-    :param start: Start point (x, y)
-    :param end: End point (x, y)
-    :param distance: Offset distance (positive = left, negative = right)
-    :return: New start and end points
+    Args:
+        start: Start point (x, y)
+        end: End point (x, y)
+        distance: Offset distance (positive = left, negative = right)
+    Returns:
+        New start and end points
     """
     # Direction vector
     dx = end[0] - start[0]
@@ -78,12 +80,14 @@ def is_point_near_segment(point: Tuple[float, float],
     """
     Check if a point is near a line segment.
 
-    :param point: Point to test
-    :param seg_start: Segment start
-    :param seg_end: Segment end
-    :param threshold: Maximum distance to consider "near"
-    :param margin: Extra margin for bounding box check
-    :return: True if point is near the segment
+    Args:
+        point: Point to test
+        seg_start: Segment start
+        seg_end: Segment end
+        threshold: Maximum distance to consider "near"
+        margin: Extra margin for bounding box check
+    Returns:
+        True if point is near the segment
     """
     # First check bounding box (fast rejection)
     px, py = point
@@ -107,10 +111,12 @@ def interpolate_points(start: Tuple[float, float],
     """
     Interpolate between two points.
 
-    :param start: Start point
-    :param end: End point
-    :param t: Interpolation factor (0 to 1)
-    :return: Interpolated point
+    Args:
+        start: Start point
+        end: End point
+        t: Interpolation factor (0 to 1)
+    Returns:
+        Interpolated point
     """
     x = start[0] + t * (end[0] - start[0])
     y = start[1] + t * (end[1] - start[1])
@@ -123,10 +129,12 @@ def get_arrow_points(start: Tuple[float, float],
     """
     Calculate arrow head points for a direction indicator.
 
-    :param start: Line start point
-    :param end: Line end point
-    :param size: Arrow size
-    :return: List of 3 points forming the arrow head
+    Args:
+        start: Line start point
+        end: Line end point
+        size: Arrow size
+    Returns:
+        List of 3 points forming the arrow head
     """
     # Calculate angle
     angle = math.atan2(end[1] - start[1], end[0] - start[0])
@@ -153,10 +161,12 @@ def lerp_color(color1: Tuple[int, int, int],
     """
     Linear interpolation between two RGB colors.
 
-    :param color1: First color (r, g, b)
-    :param color2: Second color (r, g, b)
-    :param t: Interpolation factor (0 to 1)
-    :return: Interpolated color
+    Args:
+        color1: First color (r, g, b)
+        color2: Second color (r, g, b)
+        t: Interpolation factor (0 to 1)
+    Returns:
+        Interpolated color
     """
     r = int(color1[0] + t * (color2[0] - color1[0]))
     g = int(color1[1] + t * (color2[1] - color1[1]))

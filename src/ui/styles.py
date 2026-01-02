@@ -4,7 +4,7 @@ Visual configuration and color schemes for the traffic simulation visualizer.
 
 
 class Colors:
-    """Color palette for the visualizer (Light Theme)"""
+    """Color palette for the visualizer"""
 
     # Background
     BG = (250, 250, 250)

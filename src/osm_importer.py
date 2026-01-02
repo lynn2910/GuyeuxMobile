@@ -356,18 +356,18 @@ def write_smap_file(output_path: str, nodes: Dict, edges: List,
         # Write header
         f.write(f"GRAPH({model}):\n")
 
-        # Write nodes - IMPORTANT: Trier par ID pour assurer la cohérence
+        # Write nodes - IMPORTANT: Sort by ID to ensure consistency
         sorted_nodes = sorted(nodes.items(), key=lambda x: int(x[0]) if x[0].isdigit() else x[0])
         for node_id, (x, y) in sorted_nodes:
             f.write(f"    NODE {node_id} ({x:.1f}, {y:.1f})\n")
 
         f.write("\n")
 
-        # Write edges - IMPORTANT: Vérifier que les nœuds source et destination existent
+        # Write edges - IMPORTANT: Check that source and destination nodes exist
         processed = set()
         valid_edges = []
 
-        # Filtrer les edges invalides
+        # Filter invalid edges
         for src, dst, distance, props in edges:
             if src not in nodes or dst not in nodes:
                 print(f"/!\\ Skipping invalid edge {src} -> {dst} (missing nodes)")

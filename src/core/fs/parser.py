@@ -25,7 +25,7 @@ class Parser:
     def current_token(self) -> Token:
         """Returns the current token without consuming it."""
         if self.pos >= len(self.tokens):
-            # Return the last token (usually EOF) if we are at the end.
+            # Return the last token if we are at the end.
             return self.tokens[-1]
         return self.tokens[self.pos]
 
@@ -53,7 +53,8 @@ class Parser:
         """
         token = self.current_token()
         if token.type not in [TokenType.IDENTIFIER, TokenType.NUMBER]:
-            raise SyntaxError(f"Expected {TokenType.IDENTIFIER} or {TokenType.NUMBER}, found {token.type} ('{token.value}') at line {token.line}")
+            raise SyntaxError(
+                f"Expected {TokenType.IDENTIFIER} or {TokenType.NUMBER}, found {token.type} ('{token.value}') at line {token.line}")
         self.advance()
         return token
 

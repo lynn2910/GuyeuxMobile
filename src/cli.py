@@ -17,12 +17,12 @@ def parse_arguments() -> argparse.Namespace:
         - visualizer (bool): Flag to enable the graphical visualizer.
     """
     parser = argparse.ArgumentParser(
-        description="Run a cellular automaton-based traffic simulation.",
+        description="Run a traffic simulation.",
         formatter_class=argparse.RawTextHelpFormatter,
         epilog="""
 Examples:
-  python main.py --map data/maps/simple_intersection.map --tps 10 --visualizer
-  python main.py --map data/maps/grid.map --tps 5 --debug
+  python main.py --map data/maps/simple_intersection.smap --tps 10 --visualizer
+  python main.py --map data/maps/grid.smap --tps 5 --debug
         """
     )
 
@@ -48,7 +48,7 @@ Examples:
         action="store_true",
         help="Enable the graphical visualizer."
     )
-    
+
     # Optional flag for verbose logging.
     parser.add_argument(
         "--debug",
@@ -79,8 +79,8 @@ def debug_log(message: str, level: str = "info"):
     if config.DEBUG:
         color_codes = {
             "info": "\033[94m",  # Blue
-            "warning": "\033[93m", # Yellow
-            "error": "\033[91m",   # Red
+            "warning": "\033[93m",  # Yellow
+            "error": "\033[91m",  # Red
             "reset": "\033[0m"
         }
         color = color_codes.get(level.lower(), "")

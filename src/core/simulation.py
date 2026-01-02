@@ -1,19 +1,18 @@
 from time import time, sleep
-from threading import Thread, Lock
+from threading import Thread
 import config
 from cli import debug_log
 
 
 class SharedState:
-    """Simple wrapper to mimic multiprocessing.Value interface for threads."""
+    """Thread-safe wrapper for shared state variables."""
     def __init__(self, value):
         self.value = value
 
 
 class Simulation:
     """
-    Manages the main simulation loop and state.
-    THREADING VERSION: Simulation runs in a separate thread (shared memory).
+    Manages the main simulation loop and state using threading.
     """
 
     def __init__(self, graph, tps: float, visualizer=None):
@@ -24,12 +23,12 @@ class Simulation:
         self.tick_duration = 1.0 / tps
         self.visualizer = visualizer
 
-        # Threading - Variables partagées
+        # Shared state for threading
         self.t = SharedState(0)
         self.running = SharedState(False)
         self.simulation_thread = None
         
-        # Cache des edges
+        # Edge caching for performance
         self.active_edges_cache = []
         self.all_edges_cache = [
             (u, v, data['object'])
@@ -37,21 +36,24 @@ class Simulation:
         ]
 
     def add_vehicle(self, vehicle, start_edge):
+        """Adds a vehicle to the simulation and places it on the starting edge."""
         vehicle.current_edge = start_edge
         start_edge.insert_vehicle(vehicle)
         self.vehicles.append(vehicle)
 
     def add_spawner(self, spawner):
+        """Registers a vehicle spawner."""
         self.spawners.append(spawner)
 
     def remove_vehicle_safely(self, vehicle):
+        """Removes a vehicle from the simulation list safely."""
         try:
             self.vehicles.remove(vehicle)
         except ValueError:
             pass
 
     def start(self):
-        """Démarre le thread de simulation"""
+        """Starts the simulation loop in a separate daemon thread."""
         self.running.value = True
 
         self.simulation_thread = Thread(
@@ -62,14 +64,15 @@ class Simulation:
         print(f"   Simulation thread started")
 
     def stop(self):
-        """Arrête le thread de simulation"""
+        """Stops the simulation thread gracefully."""
         self.running.value = False
         if self.simulation_thread:
             self.simulation_thread.join(timeout=1.0)
 
     def _simulation_loop(self):
         """
-        Boucle de simulation (tourne dans un thread séparé).
+        Main simulation loop running in a separate thread.
+        Handles tick timing and updates.
         """
         last_time = time()
         cache_update_counter = 0
@@ -81,7 +84,7 @@ class Simulation:
             elapsed = current_time - last_time
 
             if elapsed >= self.tick_duration:
-                # Mise à jour du cache tous les 10 ticks
+                # Update active edge cache periodically
                 cache_update_counter += 1
                 if cache_update_counter >= 10:
                     self.active_edges_cache = [
@@ -105,6 +108,7 @@ class Simulation:
                     sleep(sleep_time * 0.5)
 
     def _internal_step(self, edges_to_update):
+        """Performs a single simulation step: updates intersections, spawners, and edges."""
         # 1. Update traffic lights
         self.graph.update_intersections()
 
@@ -118,6 +122,7 @@ class Simulation:
 
         # 3. Update edges
         for src, dst, edge in edges_to_update:
+            # Skip empty edges
             if hasattr(edge, 'cells'):
                 if not any(cell is not None for cell in edge.cells):
                     continue
@@ -127,6 +132,7 @@ class Simulation:
 
             edge.update()
 
+            # Handle vehicle transitions between edges
             if hasattr(edge, 'peek_last_vehicle') and edge.peek_last_vehicle():
                 vehicle = edge.peek_last_vehicle()
 
@@ -162,7 +168,8 @@ class Simulation:
 
     def tick(self):
         """
-        Appelé par la boucle principale (UI).
+        Called by the main UI loop to update the visualizer.
+        Returns False if the simulation should stop.
         """
         if self.visualizer:
             current_tick = self.t.value

@@ -4,17 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="34ca026d-ff22-4622-8518-3eb132e69b03" name="Changes" comment="feat: implement threaded simulation for improved performance and UI responsiveness">
-      <change beforePath="$PROJECT_DIR$/.idea/Modelisation_math.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Modelisation_math.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="34ca026d-ff22-4622-8518-3eb132e69b03" name="Changes" comment="feat: add new `lisle_fluid.smap` map file and configure IntelliJ metadata files">
+      <change afterPath="$PROJECT_DIR$/MAP_FORMAT.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/4a2dc2ef8ad9bec3e8869c317f5e90eb259c0042.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/ca7d3a958c60564d2661845caf08b254c4302218.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ai/routing.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cli.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/cli.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/fs/parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/fs/parser.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/simulation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/simulation.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/osm_importer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/osm_importer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ui/camera.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ui/camera.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ui/geometry.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ui/geometry.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ui/renderer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ui/renderer.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ui/styles.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ui/styles.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ui/visualizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ui/visualizer.py" afterDir="false" />
     </list>
@@ -46,12 +48,12 @@
     &quot;assignee&quot;: &quot;lynn2910&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/lynn2910/GuyeuxMobile.git&quot;,
-    &quot;accountId&quot;: &quot;89f287e8-c1b6-4649-a490-86ccd70d1d80&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/lynn2910/GuyeuxMobile.git",
+    "accountId": "375013bf-fac3-42d9-b185-dd9fdf4cb369"
   }
-}</component>
+}]]></component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
@@ -271,6 +273,7 @@
       <workItem from="1765968660396" duration="1947000" />
       <workItem from="1765979662053" duration="2351000" />
       <workItem from="1767346101400" duration="575000" />
+      <workItem from="1767346738733" duration="4786000" />
     </task>
     <task id="LOCAL-00001" summary="feat: Add parser with a syntax for map declaration">
       <option name="closed" value="true" />
@@ -504,16 +507,29 @@
       <option name="project" value="LOCAL" />
       <updated>1765981165466</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="Removed outdated Overpass API cached JSON file.">
+      <option name="closed" value="true" />
+      <created>1767347047467</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1767347047467</updated>
+    </task>
+    <task id="LOCAL-00031" summary="feat: add new `lisle_fluid.smap` map file and configure IntelliJ metadata files">
+      <option name="closed" value="true" />
+      <created>1767347056440</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1767347056440</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: Generate graph at map loading" />
-    <MESSAGE value="feat: Add basic visualization" />
-    <MESSAGE value="feat: visualization" />
     <MESSAGE value="feat: vehicle spawners" />
     <MESSAGE value="feat: First version of fluid simulation" />
     <MESSAGE value="feat: better visualization for the fluid sim" />
@@ -536,7 +552,10 @@
     <MESSAGE value="feat: optimize rendering and simulation performance with caching and improved edge handling" />
     <MESSAGE value="feat: optimize visualizer and renderer with spatial indexing and improved edge handling" />
     <MESSAGE value="feat: enhance renderer and simulation performance with improved visual styles and adaptive sizing" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: enhance renderer and simulation performance with improved visual styles and adaptive sizing" />
+    <MESSAGE value="feat: implement threaded simulation for improved performance and UI responsiveness" />
+    <MESSAGE value="Removed outdated Overpass API cached JSON file." />
+    <MESSAGE value="feat: add new `lisle_fluid.smap` map file and configure IntelliJ metadata files" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add new `lisle_fluid.smap` map file and configure IntelliJ metadata files" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -551,8 +570,8 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Modelisation_math$L_isle_sur_le_doubs__fluid_.coverage" NAME="L'isle sur le doubs (fluid) Coverage Results" MODIFIED="1765981728633" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
-    <SUITE FILE_PATH="coverage/Modelisation_math$Test__fluid_.coverage" NAME="Test (fluid) Coverage Results" MODIFIED="1767346610147" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
     <SUITE FILE_PATH="coverage/Modelisation_math$Test__cellular_.coverage" NAME="Test (cellular) Coverage Results" MODIFIED="1767346643339" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
+    <SUITE FILE_PATH="coverage/Modelisation_math$Test__fluid_.coverage" NAME="Test (fluid) Coverage Results" MODIFIED="1767346969797" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
     <SUITE FILE_PATH="coverage/Modelisation_math$Belfort_big__fluid_.coverage" NAME="Belfort big (fluid) Coverage Results" MODIFIED="1765981521638" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
     <SUITE FILE_PATH="coverage/Modelisation_math$Belfort__fluid_.coverage" NAME="Belfort (fluid) Coverage Results" MODIFIED="1765975315944" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
     <SUITE FILE_PATH="coverage/Modelisation_math$Belfort__cellular_.coverage" NAME="Belfort (cellular) Coverage Results" MODIFIED="1765966871078" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />

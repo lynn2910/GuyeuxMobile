@@ -20,8 +20,8 @@ except AttributeError:
 
 class SpatialGrid:
     """
-    Structure de données spatiale simple pour accélérer les requêtes de proximité.
-    Divise l'espace en cellules pour éviter de tester tous les éléments.
+    Simple spatial data structure to accelerate proximity queries.
+    Divides space into cells to avoid testing all elements.
     """
 
     def __init__(self, cell_size=100):
@@ -32,7 +32,7 @@ class SpatialGrid:
         return (int(x // self.cell_size), int(y // self.cell_size))
 
     def _get_cells_for_bounds(self, min_x, max_x, min_y, max_y):
-        """Retourne toutes les cellules touchées par une boîte englobante"""
+        """Returns all cells touched by a bounding box."""
         cells = set()
         min_cell_x = int(min_x // self.cell_size)
         max_cell_x = int(max_x // self.cell_size)
@@ -51,7 +51,7 @@ class SpatialGrid:
         self.grid[cell]['nodes'].append((node_id, x, y))
 
     def add_edge(self, src, dst, src_pos, dst_pos, data):
-        # Ajouter l'edge à toutes les cellules qu'il traverse
+        # Add the edge to all cells it traverses
         min_x = min(src_pos[0], dst_pos[0])
         max_x = max(src_pos[0], dst_pos[0])
         min_y = min(src_pos[1], dst_pos[1])
@@ -64,7 +64,7 @@ class SpatialGrid:
             self.grid[cell]['edges'].append((src, dst, src_pos, dst_pos, data))
 
     def query_nodes(self, x, y, radius):
-        """Trouve tous les nœuds dans un rayon donné"""
+        """Finds all nodes within a given radius."""
         cells = self._get_cells_for_bounds(x - radius, x + radius, y - radius, y + radius)
         results = []
         for cell in cells:
@@ -76,7 +76,7 @@ class SpatialGrid:
         return results
 
     def query_edges(self, min_x, max_x, min_y, max_y):
-        """Trouve tous les edges dans une région"""
+        """Finds all edges within a region."""
         cells = self._get_cells_for_bounds(min_x, max_x, min_y, max_y)
         results = []
         seen = set()
@@ -124,7 +124,7 @@ class Visualizer:
 
         self.clock = pygame.time.Clock()
 
-        # Cache pour le hover
+        # Hover cache
         self._last_hover_check_pos = None
         self._hover_check_cooldown = 0
 
@@ -136,14 +136,14 @@ class Visualizer:
         }
 
     def _build_spatial_index(self):
-        """Construit un index spatial pour accélérer les requêtes de proximité."""
+        """Builds a spatial index to accelerate proximity queries."""
         self.spatial_grid = SpatialGrid(cell_size=200)
 
-        # Indexer les nœuds
+        # Index nodes
         for node_id, (x, y) in self.world_positions.items():
             self.spatial_grid.add_node(node_id, x, y)
 
-        # Indexer les edges
+        # Index edges
         for src, dst, data in self.graph.get_edges():
             src_pos = self.world_positions[src]
             dst_pos = self.world_positions[dst]
@@ -168,36 +168,36 @@ class Visualizer:
     def _check_node_hover(self, mouse_pos: Tuple[int, int]) -> Optional[str]:
         """
         Checks if the mouse is hovering over any node.
-        OPTIMIZED: Utilise l'index spatial.
+        OPTIMIZED: Uses spatial index.
         """
-        # Convertir la position de la souris en coordonnées mondiales
+        # Convert mouse position to world coordinates
         world_pos = self.camera.screen_to_world(mouse_pos)
         detection_radius = max(10, min(35, Sizes.NODE_RADIUS_HOVER * self.camera.zoom)) + 5
 
-        # Recherche spatiale
+        # Spatial search
         candidates = self.spatial_grid.query_nodes(world_pos[0], world_pos[1], detection_radius)
 
         if not candidates:
             return None
 
-        # Trouver le nœud le plus proche
+        # Find closest node
         closest = min(candidates, key=lambda x: x[3])  # x[3] = dist_sq
         return closest[0]
 
     def _check_edge_hover(self, mouse_pos: Tuple[int, int]) -> Optional[Tuple[str, str, dict]]:
         """
         Checks if the mouse is hovering over any edge.
-        OPTIMIZED: Utilise l'index spatial et évite les calculs inutiles.
+        OPTIMIZED: Uses spatial index and avoids unnecessary calculations.
         """
         world_pos = self.camera.screen_to_world(mouse_pos)
         threshold = max(6, min(20, 10 * self.camera.zoom))
 
-        # Définir une région de recherche autour de la souris
-        search_radius = threshold + 50  # Marge de sécurité
+        # Define search region around mouse
+        search_radius = threshold + 50  # Safety margin
         min_x, max_x = world_pos[0] - search_radius, world_pos[0] + search_radius
         min_y, max_y = world_pos[1] - search_radius, world_pos[1] + search_radius
 
-        # Recherche spatiale
+        # Spatial search
         candidate_edges = self.spatial_grid.query_edges(min_x, max_x, min_y, max_y)
 
         for src, dst, src_pos, dst_pos, data in candidate_edges:
@@ -219,18 +219,18 @@ class Visualizer:
     def update(self, current_tick: int):
         """
         Called by the main simulation loop to update the visualizer's state and redraw the screen.
-        OPTIMIZED: Limite les vérifications de hover.
+        OPTIMIZED: Limits hover checks.
         """
         self.current_tick = current_tick
         mouse_pos = self._get_mouse_pos()
 
-        # Vérifier le hover seulement tous les N frames ou si la souris a bougé
+        # Check hover only every N frames or if mouse moved
         self._hover_check_cooldown -= 1
         if self._hover_check_cooldown <= 0 or self._last_hover_check_pos != mouse_pos:
             self.hovered_node = self._check_node_hover(mouse_pos)
             self.hovered_edge = None if self.hovered_node else self._check_edge_hover(mouse_pos)
             self._last_hover_check_pos = mouse_pos
-            self._hover_check_cooldown = 3  # Vérifier tous les 3 frames
+            self._hover_check_cooldown = 3  # Check every 3 frames
 
         self._render()
         self.clock.tick(Animation.TARGET_FPS)
@@ -238,24 +238,24 @@ class Visualizer:
     def _render(self):
         """
         Renders the entire scene.
-        OPTIMIZED: Ordre de rendu amélioré (edges d'abord, puis nodes par-dessus).
-        THREAD-SAFE: Lecture des données protégée si simulation threadée.
+        OPTIMIZED: Improved rendering order (edges first, then nodes on top).
+        THREAD-SAFE: Data access protected if simulation is threaded.
         """
         self.renderer.clear()
         zoom = self.camera.zoom
 
         min_x, max_x, min_y, max_y = self._get_visible_bounds()
 
-        # 1. Déterminer les nœuds visibles
+        # 1. Determine visible nodes
         visible_nodes = set()
         for node_id, pos in self.world_positions.items():
             if min_x <= pos[0] <= max_x and min_y <= pos[1] <= max_y:
                 visible_nodes.add(node_id)
 
-        # 2. DESSINER LES EDGES EN PREMIER (pour qu'ils soient sous les nœuds)
-        # Note: L'accès au graph est thread-safe car on ne modifie que les véhicules
+        # 2. DRAW EDGES FIRST (so they are under nodes)
+        # Note: Graph access is thread-safe as we only modify vehicles
         for src, dst, data in self.graph.get_edges():
-            # Culling amélioré : vérifier si au moins un nœud est visible
+            # Improved culling: check if at least one node is visible
             if src not in visible_nodes and dst not in visible_nodes:
                 continue
 
@@ -267,13 +267,13 @@ class Visualizer:
 
             self.renderer.draw_edge(src_screen, dst_screen, data['object'], src, dst, is_hovered, zoom)
 
-        # 3. DESSINER LES NODES PAR-DESSUS (ils apparaissent maintenant au-dessus des edges)
+        # 3. DRAW NODES ON TOP (they now appear above edges)
         for node_id in visible_nodes:
             screen_pos = self.camera.world_to_screen(self.world_positions[node_id])
             is_hovered = node_id == self.hovered_node
             self.renderer.draw_node(screen_pos, node_id, is_hovered, zoom)
 
-        # 4. Dessiner les traffic lights
+        # 4. Draw traffic lights
         self.renderer.draw_traffic_lights(self.graph, self.camera.world_to_screen, zoom, visible_nodes)
 
         # 5. UI overlay
@@ -295,7 +295,7 @@ class Visualizer:
         node_data = self.graph.get_node(node_id)
         lines = [f"Pos: ({node_data['x']:.0f}, {node_data['y']:.0f})"]
 
-        # Ajouter le nombre de connexions
+        # Add connection counts
         incoming = len(list(self.graph.graph.predecessors(node_id)))
         outgoing = len(list(self.graph.graph.successors(node_id)))
         lines.append(f"In: {incoming}, Out: {outgoing}")
@@ -346,10 +346,10 @@ class Visualizer:
 
     def _get_visible_bounds(self):
         """
-        Calcule les limites du viewport avec une marge.
-        OPTIMIZED: Marge adaptative basée sur le zoom.
+        Calculates viewport bounds with a margin.
+        OPTIMIZED: Adaptive margin based on zoom.
         """
-        margin = max(50, 200 / self.camera.zoom)  # Marge plus grande à petit zoom
+        margin = max(50, 200 / self.camera.zoom)  # Larger margin at small zoom
         min_x, min_y = self.camera.screen_to_world((-margin, -margin))
         max_x, max_y = self.camera.screen_to_world((self.width + margin, self.height + margin))
         return min_x, max_x, min_y, max_y
