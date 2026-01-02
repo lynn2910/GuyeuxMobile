@@ -1,12 +1,19 @@
-from time import time
+from time import time, sleep
+from threading import Thread, Lock
 import config
 from cli import debug_log
+
+
+class SharedState:
+    """Simple wrapper to mimic multiprocessing.Value interface for threads."""
+    def __init__(self, value):
+        self.value = value
 
 
 class Simulation:
     """
     Manages the main simulation loop and state.
-    OPTIMIZED VERSION with UI/simulation separation for better performance.
+    THREADING VERSION: Simulation runs in a separate thread (shared memory).
     """
 
     def __init__(self, graph, tps: float, visualizer=None):
@@ -15,23 +22,19 @@ class Simulation:
         self.spawners = []
         self.tps = tps
         self.tick_duration = 1.0 / tps
-        self.t = 0
-        self.running = False
         self.visualizer = visualizer
 
-        # Séparation UI/Simulation
-        self.simulation_accumulator = 0.0
-        self.last_frame_time = time()
-
-        # Cache des edges avec seulement ceux qui ont des véhicules
+        # Threading - Variables partagées
+        self.t = SharedState(0)
+        self.running = SharedState(False)
+        self.simulation_thread = None
+        
+        # Cache des edges
         self.active_edges_cache = []
         self.all_edges_cache = [
             (u, v, data['object'])
             for u, v, data in self.graph.get_edges()
         ]
-
-        # Compteur pour mettre à jour le cache périodiquement
-        self._cache_update_counter = 0
 
     def add_vehicle(self, vehicle, start_edge):
         vehicle.current_edge = start_edge
@@ -47,59 +50,61 @@ class Simulation:
         except ValueError:
             pass
 
-    def tick(self):
+    def start(self):
+        """Démarre le thread de simulation"""
+        self.running.value = True
+
+        self.simulation_thread = Thread(
+            target=self._simulation_loop,
+            daemon=True
+        )
+        self.simulation_thread.start()
+        print(f"   Simulation thread started")
+
+    def stop(self):
+        """Arrête le thread de simulation"""
+        self.running.value = False
+        if self.simulation_thread:
+            self.simulation_thread.join(timeout=1.0)
+
+    def _simulation_loop(self):
         """
-        Main loop avec séparation UI/Simulation.
-        La simulation tourne à tps fixe, l'UI à frame rate variable.
+        Boucle de simulation (tourne dans un thread séparé).
         """
-        current_time = time()
-        frame_time = current_time - self.last_frame_time
-        self.last_frame_time = current_time
+        last_time = time()
+        cache_update_counter = 0
+        
+        print(f"   Simulation loop started in thread")
 
-        # Limiter le frame_time pour éviter le spiral of death
-        if frame_time > 0.25:
-            frame_time = 0.25
+        while self.running.value:
+            current_time = time()
+            elapsed = current_time - last_time
 
-        self.simulation_accumulator += frame_time
+            if elapsed >= self.tick_duration:
+                # Mise à jour du cache tous les 10 ticks
+                cache_update_counter += 1
+                if cache_update_counter >= 10:
+                    self.active_edges_cache = [
+                        (src, dst, edge)
+                        for src, dst, edge in self.all_edges_cache
+                        if (hasattr(edge, 'vehicles') and edge.vehicles) or
+                           (hasattr(edge, 'cells') and any(cell is not None for cell in edge.cells))
+                    ]
+                    cache_update_counter = 0
 
-        # Faire tourner la simulation à fréquence fixe (tps)
-        simulation_steps = 0
-        max_steps = 5  # Éviter trop de steps si on est en retard
+                self._internal_step(
+                    self.active_edges_cache if self.active_edges_cache else self.all_edges_cache
+                )
 
-        while self.simulation_accumulator >= self.tick_duration and simulation_steps < max_steps:
-            self.internal_step()
-            self.t += 1
-            self.simulation_accumulator -= self.tick_duration
-            simulation_steps += 1
+                self.t.value += 1
+                last_time = current_time
+                sleep(0.0001)
+            else:
+                sleep_time = self.tick_duration - elapsed
+                if sleep_time > 0:
+                    sleep(sleep_time * 0.5)
 
-        # Mettre à jour l'UI indépendamment (frame rate libre)
-        if self.visualizer:
-            self.visualizer.update(self.t)
-            if not self.visualizer.handle_events():
-                self.running = False
-
-    def _update_active_edges_cache(self):
-        """
-        Met à jour le cache des edges actifs (contenant des véhicules).
-        OPTIMIZATION: Évite d'itérer sur tous les edges à chaque tick.
-        """
-        self.active_edges_cache = [
-            (src, dst, edge)
-            for src, dst, edge in self.all_edges_cache
-            if (hasattr(edge, 'vehicles') and edge.vehicles) or
-               (hasattr(edge, 'cells') and any(cell is not None for cell in edge.cells))
-        ]
-
-    def internal_step(self):
-        """
-        Un pas de simulation (appelé à fréquence fixe).
-        """
-        # Mettre à jour le cache tous les 10 ticks pour équilibrer performance/précision
-        self._cache_update_counter += 1
-        if self._cache_update_counter >= 10:
-            self._update_active_edges_cache()
-            self._cache_update_counter = 0
-
+    def _internal_step(self, edges_to_update):
         # 1. Update traffic lights
         self.graph.update_intersections()
 
@@ -111,22 +116,17 @@ class Simulation:
                 if config.DEBUG:
                     debug_log(f"Spawned vehicle {new_vehicle.id} at {spawner.node}")
 
-        # 3. Update edges - utiliser le cache si disponible, sinon tous les edges
-        edges_to_update = self.active_edges_cache if self.active_edges_cache else self.all_edges_cache
-
+        # 3. Update edges
         for src, dst, edge in edges_to_update:
-            # Skip empty edges in cellular model
             if hasattr(edge, 'cells'):
                 if not any(cell is not None for cell in edge.cells):
                     continue
-            # Skip empty edges in fluid model
             elif hasattr(edge, 'vehicles'):
                 if not edge.vehicles:
                     continue
 
             edge.update()
 
-            # Vérifier si un véhicule peut passer à l'edge suivant
             if hasattr(edge, 'peek_last_vehicle') and edge.peek_last_vehicle():
                 vehicle = edge.peek_last_vehicle()
 
@@ -155,6 +155,19 @@ class Simulation:
                             vehicle.path.insert(0, next_node)
 
                     except RuntimeError:
-                        debug_log(f"Vehicle {vehicle.id} removed due to invalid path", "error")
+                        if config.DEBUG:
+                            debug_log(f"Vehicle {vehicle.id} removed due to invalid path", "error")
                         edge.pop_last_vehicle()
                         self.remove_vehicle_safely(vehicle)
+
+    def tick(self):
+        """
+        Appelé par la boucle principale (UI).
+        """
+        if self.visualizer:
+            current_tick = self.t.value
+            self.visualizer.update(current_tick)
+            if not self.visualizer.handle_events():
+                self.stop()
+                return False
+        return True

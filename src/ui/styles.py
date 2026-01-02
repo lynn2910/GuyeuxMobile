@@ -54,7 +54,7 @@ class Sizes:
     # Roads
     ROAD_WIDTH_BASE = 8
     ROAD_WIDTH_HOVER = 10
-    ROAD_SEPARATION = 12
+    ROAD_SEPARATION = 8
 
     # Vehicles
     VEHICLE_RADIUS = 4

@@ -4,14 +4,28 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="34ca026d-ff22-4622-8518-3eb132e69b03" name="Changes" comment="feat: optimize visualizer and renderer with spatial indexing and improved edge handling">
+    <list default="true" id="34ca026d-ff22-4622-8518-3eb132e69b03" name="Changes" comment="feat: implement threaded simulation for improved performance and UI responsiveness">
+      <change beforePath="$PROJECT_DIR$/.idea/Modelisation_math.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Modelisation_math.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ui/renderer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ui/renderer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/4a2dc2ef8ad9bec3e8869c317f5e90eb259c0042.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/ca7d3a958c60564d2661845caf08b254c4302218.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/simulation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/simulation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/osm_importer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/osm_importer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ui/styles.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ui/styles.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ui/visualizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ui/visualizer.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="51" />
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -38,6 +52,10 @@
     &quot;accountId&quot;: &quot;89f287e8-c1b6-4649-a490-86ccd70d1d80&quot;
   }
 }</component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1
 }</component>
@@ -56,22 +74,31 @@
     &quot;Python.Belfort (fluid).executor&quot;: &quot;Run&quot;,
     &quot;Python.Belfort big (fluid).executor&quot;: &quot;Run&quot;,
     &quot;Python.Belfort.executor&quot;: &quot;Run&quot;,
+    &quot;Python.L'isle sur le doubs (fluid).executor&quot;: &quot;Run&quot;,
     &quot;Python.Main.executor&quot;: &quot;Run&quot;,
     &quot;Python.TEst (no visualizer).executor&quot;: &quot;Run&quot;,
     &quot;Python.TEst.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Test (cellular).executor&quot;: &quot;Run&quot;,
+    &quot;Python.Test (fluid).executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;ai.playground.ignore.import.keys.banner.in.settings&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;R:/IUT_Code/S5/Modelisation_math/data/map&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;R:/IUT_Code/S5/Modelisation_math&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;actions.on.save&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -85,7 +112,7 @@
       <recent name="R:\IUT_Code\S5\Modelisation_math\src\entities" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.Belfort big (fluid)">
+  <component name="RunManager" selected="Python.Test (fluid)">
     <configuration name="Belfort big (fluid)" type="PythonConfigurationType" factoryName="Python">
       <module name="Modelisation_math" />
       <option name="ENV_FILES" value="" />
@@ -95,7 +122,6 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.13 (Modelisation_math)" />
       <option name="WORKING_DIRECTORY" value="R:\IUT_Code\S5\Modelisation_math" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -104,6 +130,30 @@
       <option name="RUN_TOOL" value="" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/main.py" />
       <option name="PARAMETERS" value="--map .\data\map\belfort_real_big.smap --tps 20 --visualizer" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="L'isle sur le doubs (fluid)" type="PythonConfigurationType" factoryName="Python">
+      <module name="Modelisation_math" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="R:\IUT_Code\S5\Modelisation_math" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/main.py" />
+      <option name="PARAMETERS" value="--map .\data\map\lisle_fluid.smap --tps 20 --visualizer" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -120,7 +170,6 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.13 (Modelisation_math)" />
       <option name="WORKING_DIRECTORY" value="R:\IUT_Code\S5\Modelisation_math" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -145,7 +194,6 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.13 (Modelisation_math)" />
       <option name="WORKING_DIRECTORY" value="R:\IUT_Code\S5\Modelisation_math" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -170,7 +218,6 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.13 (Modelisation_math)" />
       <option name="WORKING_DIRECTORY" value="R:\IUT_Code\S5\Modelisation_math" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -191,13 +238,14 @@
       <item itemvalue="Python.Test (cellular)" />
       <item itemvalue="Python.Test (fluid)" />
       <item itemvalue="Python.Belfort big (fluid)" />
+      <item itemvalue="Python.L'isle sur le doubs (fluid)" />
     </list>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-c7e53b3be11b-JavaScript-PY-253.28294.336" />
-        <option value="bundled-python-sdk-0978a7220b69-9867c7d4c0a4-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.28294.336" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-PY-253.29346.142" />
+        <option value="bundled-python-sdk-f2b7a9f6281b-6e1f45a539f7-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.29346.142" />
       </set>
     </attachedChunks>
   </component>
@@ -221,7 +269,8 @@
       <workItem from="1765818911709" duration="10431000" />
       <workItem from="1765966039920" duration="2577000" />
       <workItem from="1765968660396" duration="1947000" />
-      <workItem from="1765979662053" duration="1451000" />
+      <workItem from="1765979662053" duration="2351000" />
+      <workItem from="1767346101400" duration="575000" />
     </task>
     <task id="LOCAL-00001" summary="feat: Add parser with a syntax for map declaration">
       <option name="closed" value="true" />
@@ -447,14 +496,21 @@
       <option name="project" value="LOCAL" />
       <updated>1765980978668</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="feat: enhance renderer and simulation performance with improved visual styles and adaptive sizing">
+      <option name="closed" value="true" />
+      <created>1765981165466</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1765981165466</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: Cellular model was supressing some cars (oops)" />
     <MESSAGE value="feat: Generate graph at map loading" />
     <MESSAGE value="feat: Add basic visualization" />
     <MESSAGE value="feat: visualization" />
@@ -479,7 +535,8 @@
     <MESSAGE value="feat: osecours" />
     <MESSAGE value="feat: optimize rendering and simulation performance with caching and improved edge handling" />
     <MESSAGE value="feat: optimize visualizer and renderer with spatial indexing and improved edge handling" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: optimize visualizer and renderer with spatial indexing and improved edge handling" />
+    <MESSAGE value="feat: enhance renderer and simulation performance with improved visual styles and adaptive sizing" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: enhance renderer and simulation performance with improved visual styles and adaptive sizing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -493,7 +550,10 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Modelisation_math$Belfort_big__fluid_.coverage" NAME="Belfort big (fluid) Coverage Results" MODIFIED="1765980794641" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
+    <SUITE FILE_PATH="coverage/Modelisation_math$L_isle_sur_le_doubs__fluid_.coverage" NAME="L'isle sur le doubs (fluid) Coverage Results" MODIFIED="1765981728633" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
+    <SUITE FILE_PATH="coverage/Modelisation_math$Test__fluid_.coverage" NAME="Test (fluid) Coverage Results" MODIFIED="1767346610147" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
+    <SUITE FILE_PATH="coverage/Modelisation_math$Test__cellular_.coverage" NAME="Test (cellular) Coverage Results" MODIFIED="1767346643339" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
+    <SUITE FILE_PATH="coverage/Modelisation_math$Belfort_big__fluid_.coverage" NAME="Belfort big (fluid) Coverage Results" MODIFIED="1765981521638" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
     <SUITE FILE_PATH="coverage/Modelisation_math$Belfort__fluid_.coverage" NAME="Belfort (fluid) Coverage Results" MODIFIED="1765975315944" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
     <SUITE FILE_PATH="coverage/Modelisation_math$Belfort__cellular_.coverage" NAME="Belfort (cellular) Coverage Results" MODIFIED="1765966871078" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />
     <SUITE FILE_PATH="coverage/Modelisation_math$Main.coverage" NAME="TEst Coverage Results" MODIFIED="1764618729521" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="R:\IUT_Code\S5\Modelisation_math" />

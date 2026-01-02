@@ -36,11 +36,11 @@ def download_osm_network(place_name: str, network_type: str = "drive"):
     Returns:
         NetworkX MultiDiGraph from OSMnx
     """
-    print(f"📡 Downloading {network_type} network for {place_name}...")
+    print(f"   Downloading {network_type} network for {place_name}...")
 
     G = ox.graph_from_place(place_name, network_type=network_type, simplify=True)
 
-    print(f"✅ Downloaded {len(G.nodes)} nodes and {len(G.edges)} edges")
+    print(f"   Downloaded {len(G.nodes)} nodes and {len(G.edges)} edges")
     return G
 
 
@@ -56,9 +56,9 @@ def download_osm_bbox(north: float, south: float, east: float, west: float,
     Returns:
         NetworkX MultiDiGraph from OSMnx
     """
-    print(f"📡 Downloading {network_type} network for bbox...")
+    print(f"   Downloading {network_type} network for bbox...")
     G = ox.graph_from_bbox(north, south, east, west, network_type=network_type, simplify=True)
-    print(f"✅ Downloaded {len(G.nodes)} nodes and {len(G.edges)} edges")
+    print(f"   Downloaded {len(G.nodes)} nodes and {len(G.edges)} edges")
     return G
 
 
@@ -92,7 +92,7 @@ def simplify_nodes(nodes: Dict, edges: List, min_distance: float = 10.0):
     if min_distance <= 0:
         return nodes, edges
 
-    print(f"🔧 Simplifying network (min distance: {min_distance}m)...")
+    print(f"   Simplifying network (min distance: {min_distance}m)...")
 
     # Create mapping of nodes to their cluster representative
     node_to_cluster = {}
@@ -164,7 +164,7 @@ def simplify_nodes(nodes: Dict, edges: List, min_distance: float = 10.0):
 
         simplified_edges.append((new_src, new_dst, distance, props))
 
-    print(f"✅ Simplified: {len(nodes)} → {len(simplified_nodes)} nodes, {len(edges)} → {len(simplified_edges)} edges")
+    print(f"   Simplified: {len(nodes)} → {len(simplified_nodes)} nodes, {len(edges)} → {len(simplified_edges)} edges")
 
     return simplified_nodes, simplified_edges
 
@@ -204,7 +204,7 @@ def extract_graph_data(G):
         nodes_dict: {node_id: (x, y)}
         edges_list: [(src, dst, distance, properties)]
     """
-    print("📊 Extracting graph data...")
+    print("   Extracting graph data...")
 
     nodes = {}
     for node_id, data in G.nodes(data=True):
@@ -350,7 +350,7 @@ def write_smap_file(output_path: str, nodes: Dict, edges: List,
         tps: Ticks per second
         add_spawners: Whether to add automatic spawners
     """
-    print(f"💾 Writing .smap file to {output_path}...")
+    print(f"   Writing .smap file to {output_path}...")
 
     with open(output_path, 'w', encoding='utf-8') as f:
         # Write header
@@ -370,14 +370,14 @@ def write_smap_file(output_path: str, nodes: Dict, edges: List,
         # Filtrer les edges invalides
         for src, dst, distance, props in edges:
             if src not in nodes or dst not in nodes:
-                print(f"⚠️  Skipping invalid edge {src} -> {dst} (missing nodes)")
+                print(f"/!\\ Skipping invalid edge {src} -> {dst} (missing nodes)")
                 continue
             if src == dst:
-                print(f"⚠️  Skipping self-loop {src} -> {dst}")
+                print(f"/!\\ Skipping self-loop {src} -> {dst}")
                 continue
             valid_edges.append((src, dst, distance, props))
 
-        print(f"✅ Validated {len(valid_edges)}/{len(edges)} edges")
+        print(f"   Validated {len(valid_edges)}/{len(edges)} edges")
 
         for src, dst, distance, props in valid_edges:
             if (src, dst) in processed:
@@ -425,7 +425,7 @@ def write_smap_file(output_path: str, nodes: Dict, edges: List,
                 f.write(f"    TRAFFIC_LIGHT {node_id} duration={duration}\n")
                 traffic_lights_added += 1
 
-        print(f"✅ Added {traffic_lights_added} traffic lights")
+        print(f"   Added {traffic_lights_added} traffic lights")
 
         # Write vehicles section (empty)
         f.write("\nVEHICLES:\n")
@@ -452,11 +452,11 @@ def write_smap_file(output_path: str, nodes: Dict, edges: List,
                 ratio = 0.1 if outgoing_count[node_id] == 1 else 0.15
                 f.write(f"    SPAWNER {node_id} ratio={ratio}\n")
 
-            print(f"✅ Added {len(selected_spawners)} spawners")
+            print(f"   Added {len(selected_spawners)} spawners")
         else:
             f.write("\nSPAWNERS:\n")
 
-    print(f"✅ Successfully wrote .smap file!")
+    print(f"   Successfully wrote .smap file!")
 
 
 def main():
@@ -574,7 +574,7 @@ Examples:
         add_spawners=not args.no_spawners
     )
 
-    print("\n🎉 Done! You can now run:")
+    print("\n   Done! You can now run:")
     print(f"   python src/main.py --map {args.output} --tps {args.tps} --visualizer")
 
 

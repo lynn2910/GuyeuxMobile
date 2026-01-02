@@ -239,6 +239,7 @@ class Visualizer:
         """
         Renders the entire scene.
         OPTIMIZED: Ordre de rendu amélioré (edges d'abord, puis nodes par-dessus).
+        THREAD-SAFE: Lecture des données protégée si simulation threadée.
         """
         self.renderer.clear()
         zoom = self.camera.zoom
@@ -252,6 +253,7 @@ class Visualizer:
                 visible_nodes.add(node_id)
 
         # 2. DESSINER LES EDGES EN PREMIER (pour qu'ils soient sous les nœuds)
+        # Note: L'accès au graph est thread-safe car on ne modifie que les véhicules
         for src, dst, data in self.graph.get_edges():
             # Culling amélioré : vérifier si au moins un nœud est visible
             if src not in visible_nodes and dst not in visible_nodes:

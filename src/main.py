@@ -3,6 +3,8 @@ Main entry point for the traffic simulation application.
 
 This script handles command-line argument parsing, map file loading,
 and the initialization of the main simulation loop.
+
+THREADING VERSION: Simulation runs in separate thread.
 """
 import os
 from os import path
@@ -29,7 +31,7 @@ def run_simulation_from_file(file_path: str, tps: float, show_viz: bool):
     1. Initializes required folders.
     2. Parses the specified .map file to build the graph, vehicles, and spawners.
     3. Optionally initializes the Pygame visualizer.
-    4. Creates and runs the main Simulation object.
+    4. Creates and runs the main Simulation object with threading.
 
     Args:
         file_path (str): The path to the .map file.
@@ -44,12 +46,6 @@ def run_simulation_from_file(file_path: str, tps: float, show_viz: bool):
     print(f"Graph loaded: {len(graph.graph.nodes)} nodes, {len(graph.graph.edges)} edges")
     print(f"Initial vehicles: {len(vehicles)}")
     print(f"Spawners: {len(spawners)}")
-
-    # Generate a static image of the graph layout.
-    # print("\nGenerating graph map image...")
-    # file_name = path.basename(file_path).split('.')[0]
-    # graph.show_map(file_name)
-    # print(f"Map image saved to data/results/{file_name}.png")
 
     # Initialize the visualizer if requested.
     viz = None
@@ -66,18 +62,29 @@ def run_simulation_from_file(file_path: str, tps: float, show_viz: bool):
         simulation.add_vehicle(vehicle, start_edge)
         debug_log(f"Vehicle {vehicle.id} added with path: {vehicle.path}")
 
-    # --- Main Simulation Loop ---
+    # --- Main Loop with Threading ---
     print(f"\nLaunching simulation at {tps} TPS... (Press Ctrl+C to stop)")
-    simulation.running = True
+    print("   Simulation running in SEPARATE THREAD\n")
+
+    # Démarrer le thread de simulation
+    simulation.start()
+
     try:
-        while simulation.running:
-            simulation.tick()
+        # Boucle UI (thread principal) - tourne aussi vite que possible
+        while simulation.running.value:
+            # tick() ne fait que l'UI maintenant
+            if not simulation.tick():
+                break
     except KeyboardInterrupt:
-        print("\nSimulation interrupted by user.")
+        print("\n\n⚠️  Simulation interrupted by user.")
     finally:
+        # Arrêter proprement le thread de simulation
+        simulation.stop()
+
         if viz:
             viz.close()
-        print(f"\nSimulation finished after {simulation.t} ticks.")
+
+        print(f"\n   Simulation finished after {simulation.t.value} ticks.")
 
 
 if __name__ == "__main__":
